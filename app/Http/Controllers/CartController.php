@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
@@ -201,6 +202,7 @@ class CartController extends Controller
         } else {
             $message = 'Sản phẩm không tìm thấy trong giỏ hàng.';
         }
+        CartItem::where('id',$id)->delete();
 
         return redirect()->route('carts.index')->with('success', $message);
     }

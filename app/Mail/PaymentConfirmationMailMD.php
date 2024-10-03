@@ -8,9 +8,8 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
 
-class PaymentConfirmationMail extends Mailable
+class PaymentConfirmationMailMD extends Mailable
 {
     use Queueable, SerializesModels;
     public $orderData;
@@ -23,43 +22,32 @@ class PaymentConfirmationMail extends Mailable
     }
 
     /**
-     * Định nghĩa tiêu đề email..
+     * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Payment Confirmation Mail',
+            subject: 'Payment Confirmation Mail M D',
         );
     }
 
     /**
-     * Định nghĩa nội dung email.
+     * Get the message content definition.
      */
     public function content(): Content
     {
         return new Content(
-            view: 'emails.payment_confirmation',
+            markdown: 'emails.payment_confirmationMD',
         );
     }
 
     /**
-     * Thêm file đính kèm nếu cần.
+     * Get the attachments for the message.
      *
      * @return array<int, \Illuminate\Mail\Mailables\Attachment>
      */
     public function attachments(): array
     {
         return [];
-    }
-    /**
-     *  Xây dựng email.
-     *
-     * @return $this
-     */
-    public function build()
-    {
-        return $this->subject('Payment Confirmation')
-                    ->view('emails.payment_confirmation')
-                    ->with('orderData', $this->orderData);
     }
 }

@@ -67,6 +67,16 @@ return new class extends Migration
                 'role' => 'admin',
                 'created_at' => now(),
                 'updated_at' => now(),
+            ],
+            [
+                'name' => 'Nguyễn Văn Hải',
+                'email' => 'existingUser@gmail.com',
+                'password' => Hash::make('abCD@1234'),
+                'address' => 'NB',
+                'phone' => '0373194245',
+                'role' => 'admin',
+                'created_at' => now(),
+                'updated_at' => now(),
             ]
         ]);
     }

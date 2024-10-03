@@ -43,6 +43,6 @@
         </tbody>
     </table>
 
-    <a href="{{ route('orders.index') }}" class="btn btn-secondary">Quay lại Danh Sách Đơn Hàng</a>
+    <a href="{{ route('admin.orders.index') }}" class="btn btn-secondary">Quay lại Danh Sách Đơn Hàng</a>
 </div>
 @endsection

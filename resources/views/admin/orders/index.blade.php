@@ -30,10 +30,27 @@
                         </td>
                         
                         <td>{{ number_format($order->amount, 0, ',', '.') }} đ</td>
-                        <td>{{ ucfirst($order->status) }}</td>
+                        <!-- <td>{{ ucfirst($order->status) }}</td> -->
+                        <td>
+                            <!-- Form để thay đổi trạng thái đơn hàng -->
+                            <form action="{{ route('admin.orders.updatestatus', $order->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <select name="status" onchange="this.form.submit()" class="form-control">
+                                    <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Đang chờ</option>
+                                    <option value="confirmed" {{ $order->status == 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
+                                    <option value="paid" {{ $order->status == 'paid' ? 'selected' : '' }}>Đã thanh toán</option>
+                                    <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Đang vận chuyển</option>
+                                    <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Hoàn thành</option>
+                                    <option value="canceled" {{ $order->status == 'canceled' ? 'selected' : '' }}>Đã hủy</option>
+                                    <option value="failed" {{ $order->status == 'failed' ? 'selected' : '' }}>Thất bại</option>
+                                </select>
+                            </form>
+                        </td>
+                        
                         <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                         <td>
-                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-info btn-sm">Xem Chi Tiết</a>
+                            <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-info btn-sm">Xem Chi Tiết</a>
                         </td>
                         <td>
                             <ul>
@@ -54,5 +71,6 @@
     @else
         <p>Không có đơn hàng nào để hiển thị.</p>
     @endif
+    <a href="{{ route('welcome') }}" class="btn btn-primary">Tiếp tục mua sắm</a>
 </div>
 @endsection

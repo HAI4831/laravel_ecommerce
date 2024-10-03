@@ -27,7 +27,7 @@ class OrderController extends Controller
                            ->paginate(20);
         }
 
-        return view('orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders'));
     }
 
     /**
@@ -45,8 +45,16 @@ class OrderController extends Controller
             abort(403, 'Bạn không có quyền truy cập đơn hàng này.');
         }
 
-        return view('orders.show', compact('order'));
+        return view('admin.orders.show', compact('order'));
     }
+    public function updateStatus(Request $request, $id){
+        $order = Order::findOrFail($id);
+        $order->status = $request->status; // status cd the lâ 'paid' hoac 'cancelled'
+        $order->save();
+        return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái đơn hàng thành
+        công!');
+    }
+
 
     // Các phương thức khác (create, store, edit, update, destroy) có thể được thêm nếu cần
 }

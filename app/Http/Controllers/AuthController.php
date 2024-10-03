@@ -23,9 +23,20 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|confirmed|min:6',
-            'address' => 'nullable|string|max:255', 
-            'phone' => 'nullable|string|max:20',    
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                'min:8', // Tăng độ dài tối thiểu từ 6 lên 8
+                'regex:/[A-Z]/', // Yêu cầu ít nhất một chữ cái viết hoa
+            ],
+            // 'address' => 'nullable|string|max:255', 
+            // 'phone' => 'nullable|string|max:20',    
+        ], [
+            'password.regex' => 'Password phải chứa ít nhất một chữ cái viết hoa.',
+            // 'password.min' => 'Password phải có ít nhất :min ký tự.',
+            // 'password.confirmed' => 'Password confirmation không khớp.',
+            // 'email.unique' => 'Email đã được sử dụng.'
         ]);
 
         // Tạo người dùng mới
@@ -62,7 +73,14 @@ class AuthController extends Controller
         ]);
         // Xác thực người dùng
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            // Đăng nhập thành công
+            // Lấy thông tin người dùng đã đăng nhập
+            $user = Auth::user();
+            // Kiểm tra vai trò của người dùng
+            if ($user->role==='admin') {
+                // Nếu là admin, chuyển hướng đến dashboard
+                return redirect()->intended(route('admin.dashboard'))->with('success', 'Welcome to Admin Dashboard.');
+            }
+            // Nếu là user, chuyển hướng đến trang welcome
             return redirect()->intended('home')->with('success', 'You are logged in.');
         }
 

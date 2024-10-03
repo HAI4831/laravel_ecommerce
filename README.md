@@ -399,3 +399,55 @@ php artisan optimize:clear
     //để nhận cập nhật cấu hình ở file config .env
     php artisan config:clear
 9. php artisan make:policy OrderPolicy --model=Order
+10. php artisan make:mail PaymentConfirmationMailMD --markdown=emails.payment_confirmationMD
+sử dụng --markdown cho gửi tin nhắn email đẹp ,cao cấp hơn
+11. setTimezone cho vnp_CreateDate
+đặt múi giờ cho laravel ntn để "vnp_CreateDate" trả về đúng
+ChatGPT đã nói:
+ChatGPT
+Để đặt múi giờ cho Laravel và đảm bảo rằng giá trị vnp_CreateDate trả về đúng, bạn có thể làm theo các bước sau:
+
+Bước 1: Cấu Hình Múi Giờ Trong Laravel
+Mở tệp cấu hình config/app.php.
+
+Tìm phần timezone: Bạn sẽ thấy một dòng như sau:
+
+php
+Sao chép mã
+'timezone' => 'UTC',
+Thay đổi UTC thành múi giờ bạn muốn sử dụng. Đối với Việt Nam, bạn có thể đặt:
+
+php
+Sao chép mã
+'timezone' => 'Asia/Ho_Chi_Minh',
+Bước 2: Kiểm Tra Cấu Hình Múi Giờ
+Sau khi thay đổi múi giờ trong tệp cấu hình, bạn có thể kiểm tra xem múi giờ đã được áp dụng đúng hay chưa bằng cách sử dụng lệnh Artisan trong terminal:
+
+bash
+Sao chép mã
+php artisan tinker
+Trong môi trường Tinker, bạn có thể chạy:
+
+php
+Sao chép mã
+echo date_default_timezone_get(); // Kiểm tra múi giờ hiện tại
+Bước 3: Sử Dụng vnp_CreateDate
+Khi đã đặt múi giờ, bạn có thể sử dụng date('YmdHis') hoặc Carbon để lấy thời gian hiện tại:
+
+php
+Sao chép mã
+use Carbon\Carbon;
+
+// Đảm bảo bạn đã đặt múi giờ ở trên
+"vnp_CreateDate" => Carbon::now()->format('YmdHis'),
+Bước 4: Kiểm Tra Kết Quả
+Khi bạn thực hiện thanh toán, giá trị vnp_CreateDate sẽ trả về theo múi giờ đã cấu hình:
+
+php
+Sao chép mã
+dd("vnp_CreateDate: " . Carbon::now()->format('YmdHis'));
+Lưu Ý
+Sau khi thay đổi cấu hình, bạn có thể cần phải khởi động lại ứng dụng của mình để các thay đổi có hiệu lực.
+Đảm bảo rằng server nơi ứng dụng Laravel của bạn được đồng bộ hóa thời gian chính xác, nếu không có thể dẫn đến sự khác biệt về thời gian.
+Tổng Kết
+Sau khi thực hiện các bước trên, giá trị vnp_CreateDate sẽ trả về đúng theo múi giờ bạn đã cấu hình trong Laravel.

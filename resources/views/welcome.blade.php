@@ -2,7 +2,10 @@
 
 @section('content')
 <div class="container mt-4">
-    <h1 class="mb-4 text-center">Welcome to Perfume Store</h1>
+    <!-- Thêm div với role="banner" -->
+    <div role="banner">
+        <h1 class="mb-4 text-center" id="banner" name="banner">Welcome to Perfume Store</h1>
+    </div>
     
     <div class="row">
         @foreach ($products as $index => $product)

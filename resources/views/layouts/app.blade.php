@@ -19,13 +19,19 @@
     <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav">
     <li class="nav-item active">
-    <a class="nav-link" href="{{ url('/') }}">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="{{ url('/') }}">Home <span class="sr-only">(current)</span></a>
     </li>
     <li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.products.index') }}">Products</a>
+        <a class="nav-link" href="{{ route('admin.dashboard') }}">doashboard</a>
     </li>
     <li class="nav-item">
-    <a class="nav-link" href="{{ route('admin.categories.index') }}">Categories</a>
+        <a class="nav-link" href="{{ route('admin.products.index') }}">Products</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin.categories.index') }}">Categories</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin.reports.index') }}">report</a>
     </li>
     <!-- Cart Link -->
     @auth
@@ -34,7 +40,7 @@
         </li>
     <!-- Order Link -->
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('orders.index') }}">Order</a>
+            <a class="nav-link" href="{{ route('admin.orders.index') }}">Order</a>
         </li>
     @endauth
     <!-- Thêm liên kết đăng ký và đăng nhập -->

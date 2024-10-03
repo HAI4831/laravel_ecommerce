@@ -10,7 +10,9 @@ use App\Models\OrderItem;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CartItem;
+use App\Mail\PaymentConfirmationMailMD;
 use App\Mail\PaymentConfirmationMail;
+use App\Jobs\DeletePendingOrderJob;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -92,12 +94,14 @@ class PaymentController extends Controller
             $order->amount = $totalAmount;
             $order->customer_name = $customerName; // Lấy tên khách hàng
             $order->status = 'pending'; // Trạng thái đơn hàng
-
             // Lưu đơn hàng và kiểm tra xem có thành công không
             if (!$order->save()) {
                 throw new \Exception('Lỗi khi lưu đơn hàng.');
             }
-
+            // Gửi job sau 2 phút
+            \Log::info('Dispatching DeletePendingOrderJob for order ID: ' . $order->id);
+            DeletePendingOrderJob::dispatch($order->id)->delay(now()->addMinutes(2));
+            \Log::info('Dispatched DeletePendingOrderJob successfully.');
             // Lưu OrderItem với cart_item_id
             foreach ($products as $product) {
                 OrderItem::create([
@@ -136,13 +140,15 @@ class PaymentController extends Controller
         switch ($paymentMethod) {
             case 'cash_on_delivery':
                 // Gửi email xác nhận thanh toán
-                Mail::to($request->user()->email)->send(new PaymentConfirmationMail($orderData));
+                Mail::to($request->user()->email)->send(new PaymentConfirmationMailMD($orderData));
+                // Mail::to($request->user()->email)->send(new PaymentConfirmationMail($orderData));
                 break;
 
             case 'VNPay':
                 $order->status = 'confirmed'; 
                 DB::commit(); // Commit transaction trước khi redirect
-                return redirect()->route('vnpay.pay', ['invoice_id' => $invoiceId]);
+                return redirect()->route('vnpay.checkout');
+                // return redirect()->route('vnpay.checkout', ['order_id' => $order->id]);
 
             case 'credit_card':
                 $order->status = 'confirmed'; 
@@ -216,9 +222,9 @@ class PaymentController extends Controller
             $order->save();
 
             // Xóa các mục trong giỏ hàng theo `cart_item_id`
-            // foreach ($order->orderItems as $orderItem) {
-            //     CartItem::where('id', $orderItem->cart_item_id)->delete();
-            // }
+            foreach ($order->orderItems as $orderItem) {
+                CartItem::where('id', $orderItem->cart_item_id)->delete();
+            }
 
             // Xóa giỏ hàng trong session
             session()->forget('carts'); // Hoặc session()->flush(); để xóa tất cả

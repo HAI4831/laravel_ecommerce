@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('amount', 15, 2); // Tổng số tiền
             $table->enum('status', ['pending', 'confirmed', 'paid', 'shipped', 'completed', 'canceled', 'failed'])->default('pending');
             $table->string('customer_name'); // Tên khách hàng
+            $table->string('payment_method'); // Phương thức thanh toán
             $table->timestamp('payment_date')->nullable();//Ngày thanh toán
             $table->timestamps();
 

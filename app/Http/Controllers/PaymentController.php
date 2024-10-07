@@ -93,6 +93,7 @@ class PaymentController extends Controller
             $order->user_id = auth()->id(); // Lấy ID người dùng đã đăng nhập
             $order->amount = $totalAmount;
             $order->customer_name = $customerName; // Lấy tên khách hàng
+            $order->payment_method = $paymentMethod;
             $order->status = 'pending'; // Trạng thái đơn hàng
             // Lưu đơn hàng và kiểm tra xem có thành công không
             if (!$order->save()) {
@@ -102,6 +103,7 @@ class PaymentController extends Controller
             \Log::info('Dispatching DeletePendingOrderJob for order ID: ' . $order->id);
             DeletePendingOrderJob::dispatch($order->id)->delay(now()->addMinutes(2));
             \Log::info('Dispatched DeletePendingOrderJob successfully.');
+            // dd($products);
             // Lưu OrderItem với cart_item_id
             foreach ($products as $product) {
                 OrderItem::create([
@@ -117,6 +119,7 @@ class PaymentController extends Controller
 
             // Commit transaction trước khi gửi email
             DB::commit(); // Commit transaction
+            // dd($products);
 
             // Tạo URL xác nhận thanh toán được ký
             $confirmUrl = URL::signedRoute('payment.confirm', [

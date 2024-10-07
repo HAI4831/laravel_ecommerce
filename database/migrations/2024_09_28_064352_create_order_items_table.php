@@ -26,7 +26,7 @@
                 // Khóa ngoại
                 $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
                 $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-                $table->foreign('cart_item_id')->references('id')->on('cart_items')->onDelete('cascade');
+                $table->foreign('cart_item_id')->references('id')->on('cart_items');
             });
         }
 

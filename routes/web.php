@@ -14,6 +14,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\VNPayController;
 use App\Mail\PaymentConfirmationMail;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\RatingController;
 
 
 
@@ -65,7 +67,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/vnpay/checkout', [VNPayController::class, 'checkout'])->name('vnpay.checkout');
     // Route để xử lý kết quả trả về từ VNPay
     Route::get('/vnpay/return', [VNPayController::class, 'return'])->name('vnpay.return');
-
-    
+    // Xử lí comment
+    Route::post('/products/{product}/comments', [CommentController::class, 'store'])->name('comments.store');
+    //product details
+    Route::post('/products/{product}', [ProductController::class, 'details'])->name('products.details');
+    Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
+    Route::get('/search/suggestions', [ProductController::class, 'searchSuggestions'])->name('search.suggestions');
 });
 

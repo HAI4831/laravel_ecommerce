@@ -11,6 +11,7 @@
                     <th>Mã Đơn Hàng</th>
                     <th>Khách Hàng</th>
                     <th>Tổng Tiền</th>
+                    <th>Phương thức thanh toán</th>
                     <th>Trạng Thái</th>
                     <th>Ngày Đặt Hàng</th>
                     <th>Hành Động</th>
@@ -30,6 +31,9 @@
                         </td>
                         
                         <td>{{ number_format($order->amount, 0, ',', '.') }} đ</td>
+                        <td>
+                            {{ $order->payment_method}}
+                        </td>
                         <!-- <td>{{ ucfirst($order->status) }}</td> -->
                         <td>
                             <!-- Form để thay đổi trạng thái đơn hàng -->

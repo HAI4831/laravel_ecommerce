@@ -7,6 +7,17 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    public function searchSuggestions(Request $request)
+    {
+        $query = $request->input('query');
+        
+        // Tìm kiếm sản phẩm dựa trên từ khóa
+        $products = Product::where('name', 'LIKE', '%' . $query . '%')
+            ->limit(5) // Giới hạn kết quả
+            ->get(['name']); // Chỉ lấy trường name
+
+        return response()->json($products); // Trả về JSON
+    }
         // Hiển thị danh sách tất cả các sản phẩm
         public function index(Request $request)
     {
@@ -24,6 +35,16 @@ class ProductController extends Controller
         $products = $query->get(); // Lấy tất cả sản phẩm sau khi áp dụng tìm kiếm
 
         return view('admin.products.index', compact('products'));
+    }
+    public function details($id){
+         // Tải tất cả các mối quan hệ: category, ratings, comments và user của từng comment
+        $product = Product::with([
+            'category',           // Mối quan hệ với Category
+            'ratings',            // Mối quan hệ với Rating
+            'comments.user'       // Mối quan hệ với Comment và User của mỗi Comment
+        ])->findOrFail($id);
+        
+        return view('products.details',compact('product'));
     }
 
 

@@ -17,6 +17,13 @@ class ReportController extends Controller
             ->where('orders.status', 'paid')
             ->groupBy('products.category_id')
             ->get();
+        // dd($categoryRevenue);
+        // Thống kê doanh thu theo từng phương thức thanh toán
+        $paymentMethodRevenue = DB::table('orders')
+            ->select('payment_method', DB::raw('SUM(amount) as total_revenue'))
+            ->where('status', 'paid')
+            ->groupBy('payment_method')
+            ->get();
 
         // Tổng số đơn hàng
         $totalOrders = Order::count();
@@ -25,23 +32,24 @@ class ReportController extends Controller
         $totalCustomers = DB::table('users')->where('role', 'user')->count();
 
         // Doanh thu theo ngày, tháng, năm
-        $revenueByDate = Order::select(DB::raw('DATE(created_at) as date, SUM(amount) as total_revenue')) // Changed 'total' to 'amount'
+        $revenueByDate = Order::select(DB::raw('DATE(created_at) as date, SUM(amount) as total_revenue'))
             ->where('status', 'paid')
             ->groupBy('date')
             ->get();
 
-        $revenueByMonth = Order::select(DB::raw('MONTH(created_at) as month, SUM(amount) as total_revenue')) // Changed 'total' to 'amount'
+        $revenueByMonth = Order::select(DB::raw('MONTH(created_at) as month, SUM(amount) as total_revenue'))
             ->where('status', 'paid')
             ->groupBy('month')
             ->get();
 
-        $revenueByYear = Order::select(DB::raw('YEAR(created_at) as year, SUM(amount) as total_revenue')) // Changed 'total' to 'amount'
+        $revenueByYear = Order::select(DB::raw('YEAR(created_at) as year, SUM(amount) as total_revenue'))
             ->where('status', 'paid')
             ->groupBy('year')
             ->get();
 
         return view('admin.reports.index', compact(
             'categoryRevenue',
+            'paymentMethodRevenue',
             'totalOrders',
             'totalCustomers',
             'revenueByDate',

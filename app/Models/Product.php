@@ -15,10 +15,27 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+        public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
     // Accessor for formatted price
     public function getFormattedPriceAttribute()
     {
         return number_format($this->price, 0, ',', '.') . ' VNĐ';
+    }
+        public function ratings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+    /**
+     * Tính trung bình đánh giá của sản phẩm.
+     *
+     * @return float
+     */
+    public function averageRating()
+    {
+        return $this->ratings()->avg('rating') ?? 0;
     }
 }
 

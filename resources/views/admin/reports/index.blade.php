@@ -28,6 +28,24 @@
         </tbody>
     </table>
 
+    <h3>Doanh thu theo phương thức thanh toán</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Phương thức thanh toán</th>
+                <th>Tổng doanh thu</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($paymentMethodRevenue as $revenue)
+            <tr>
+                <td>{{ $revenue->payment_method }}</td>
+                <td>{{ number_format($revenue->total_revenue, 2) }} VND</td>
+            </tr> 
+            @endforeach
+        </tbody>
+    </table>
+
     <h3>Doanh thu theo ngày</h3>
     <table class="table">
         <thead>

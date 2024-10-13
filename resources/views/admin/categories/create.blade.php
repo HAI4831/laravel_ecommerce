@@ -1,4 +1,3 @@
-<!-- resources/views/categories/create.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -8,10 +7,10 @@
             <div class="pull-left">
                 <h2>Create New Category</h2>
             </div>
-        <div class="pull-right">
+            <div class="pull-right">
                 <a class="btn btn-primary" href="{{ route('admin.categories.index') }}"> Back</a>
+            </div>
         </div>
-    </div>
     </div>
 
     <form action="{{ route('admin.categories.store') }}" method="POST">
@@ -20,9 +19,14 @@
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="form-group">
                     <strong>Name:</strong>
-                    <input type="text" name="name" class="form-control" placeholder="Name" required>
+                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" placeholder="Name" value="{{ old('name') }}" required>
+                    @error('name')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
-        </div>
+            </div>
             <div class="col-xs-12 col-sm-12 col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

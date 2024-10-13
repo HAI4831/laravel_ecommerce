@@ -59,9 +59,11 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric',
+            'description' => 'nullable|string|max:1000',
+            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:1',
             'category_id' => 'nullable|exists:categories,id',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         // Khởi tạo biến cho tên hình ảnh
         $imageName = null;
@@ -105,8 +107,8 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
+            'price' => 'required|numeric|min:0',
+            'quantity' => 'required|integer|min:1',
             'category_id' => 'required|integer|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image upload
         ]);

@@ -14,7 +14,7 @@
             Schema::create('order_items', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('order_id'); // Liên kết với đơn hàng
-                $table->unsignedBigInteger('cart_item_id');
+                // $table->unsignedBigInteger('cart_item_id');
                 // ->after('order_id');
                 $table->unsignedBigInteger('product_id'); // Liên kết với sản phẩm
                 $table->string('name'); // Tên sản phẩm
@@ -26,7 +26,7 @@
                 // Khóa ngoại
                 $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
                 $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
-                $table->foreign('cart_item_id')->references('id')->on('cart_items');
+                // $table->foreign('cart_item_id')->references('id')->on('cart_items');
             });
         }
 

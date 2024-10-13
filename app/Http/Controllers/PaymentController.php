@@ -108,7 +108,7 @@ class PaymentController extends Controller
             foreach ($products as $product) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'cart_item_id' => $product['cart_item_id'], // Lưu cart_item_id
+                    // 'cart_item_id' => $product['cart_item_id'], // Lưu cart_item_id
                     'product_id' => $product['id'],
                     'name' => $product['name'],
                     'quantity' => $product['quantity'],
@@ -116,13 +116,14 @@ class PaymentController extends Controller
                     'total_price' => $product['price'] * $product['quantity'],
                 ]);
             }
+            CartItem::where('id', $product['cart_item_id'])->delete();
 
             // Commit transaction trước khi gửi email
             DB::commit(); // Commit transaction
             // dd($products);
 
             // Tạo URL xác nhận thanh toán được ký
-            $confirmUrl = URL::signedRoute('payment.confirm', [
+            $confirmEmailUrl = URL::signedRoute('payment.email.confirm', [
                 'order_id' => $order->id,
                 'payment_method' => $paymentMethod,
             ]);
@@ -136,11 +137,14 @@ class PaymentController extends Controller
                 'coupon' => $coupon,
                 'payment_method' => $paymentMethod,
                 'date' => now()->format('d/m/Y'),
-                'confirm_url' => $confirmUrl,
+                'confirm_email_url' => $confirmEmailUrl,
             ];
 
             // Sử dụng switch case để xử lý phương thức thanh toán
         switch ($paymentMethod) {
+            case 'pay_now':
+                return $this->confirmPayment($order->id);
+                break;
             case 'cash_on_delivery':
                 // Gửi email xác nhận thanh toán
                 Mail::to($request->user()->email)->send(new PaymentConfirmationMailMD($orderData));
@@ -182,25 +186,27 @@ class PaymentController extends Controller
         }
     }
         
-
-    /**
-     * Xử lý xác nhận thanh toán từ email qua GET request với Signed Route
-     */
-    public function confirmPayment(Request $request)
+    public function confirmEmail(Request $request)
     {
         // Kiểm tra xem URL có hợp lệ và chưa hết hạn không
         if (!$request->hasValidSignature()) {
             return redirect()->route('home')->with('error', 'Liên kết xác nhận không hợp lệ hoặc đã hết hạn.');
         }
-
         // Lấy order_id và payment_method từ request
         $orderId = $request->query('order_id');
         $paymentMethod = $request->query('payment_method');
+        return $this->confirmPayment($orderId);
+    }
 
+    /**
+     * Xử lý xác nhận thanh toán từ email qua GET request với Signed Route
+     */
+    public function confirmPayment(String $orderId)
+    {
         // Sử dụng transaction để đảm bảo tính toàn vẹn của dữ liệu
-        DB::beginTransaction();
+        // DB::beginTransaction();
 
-        try {
+        // try {
             // Tìm đơn hàng trong database bằng order_id
             $order = Order::find($orderId);
 
@@ -210,12 +216,11 @@ class PaymentController extends Controller
             }
 
             // Kiểm tra trạng thái đơn hàng
-            if ($order->status !== 'pending') {
-                throw new \Exception('Đơn hàng đã được xử lý.');
-            }
-
+            // if ($order->status !== 'pending') {
+            //     throw new \Exception('Đơn hàng đã được xử lý.');
+            // }
             // Cập nhật trạng thái dựa trên phương thức thanh toán
-            if ($paymentMethod === 'cash_on_delivery') {
+            if ($order->payment_method === 'cash_on_delivery') {
                 $order->status = 'confirmed'; // Nếu là "cash_on_delivery"
             } else {
                 $order->status = 'paid'; // Nếu là các phương thức khác
@@ -225,9 +230,10 @@ class PaymentController extends Controller
             $order->save();
 
             // Xóa các mục trong giỏ hàng theo `cart_item_id`
-            foreach ($order->orderItems as $orderItem) {
-                CartItem::where('id', $orderItem->cart_item_id)->delete();
-            }
+            // foreach ($order->orderItems as $orderItem) {
+            //     CartItem::where('id', $orderItem->cart_item_id)->delete();
+            // }
+
 
             // Xóa giỏ hàng trong session
             session()->forget('carts'); // Hoặc session()->flush(); để xóa tất cả
@@ -255,15 +261,15 @@ class PaymentController extends Controller
             $pdf = Pdf::loadView('invoices.invoice', ['invoiceData' => $invoiceData]);
 
             // Commit transaction trước khi tải PDF
-            DB::commit();
+            // DB::commit();
 
             // Tải hóa đơn dưới dạng PDF
             return $pdf->download('invoice.pdf');
 
-        } catch (\Exception $e) {
-            DB::rollBack(); // Rollback transaction nếu có lỗi
-            return redirect()->route('home')->with('error', $e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack(); // Rollback transaction nếu có lỗi
+        //     return redirect()->route('home')->with('error', $e->getMessage());
+        // }
     }
 
     /**

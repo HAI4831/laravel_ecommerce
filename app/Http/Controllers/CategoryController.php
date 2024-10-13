@@ -21,7 +21,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name',
         ]);
 
         Category::create($request->all());
@@ -43,6 +43,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            // 'name' => 'required|string|max:255|unique:categories,name,' . $id, // Unique validation excluding the current category
         ]);
 
         $category->update($request->all());

@@ -1,4 +1,3 @@
-<!-- resources/views/login.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -27,18 +26,29 @@
                         @csrf
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" id="email" class="form-control" required>
+                            <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" required>
+                            @error('email')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" name="password" id="password" class="form-control" required>
+                            <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required>
+                            @error('password')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
                         </div>
                         <button type="submit" id="login" name="login" class="btn btn-primary w-100">Login</button>
                     </form>
+                    <div class="mt-3 text-center">
+                        <a href="{{ url('password/forget') }}" class="text-primary">Quên mật khẩu?</a>
+                    </div>
                 </div>
             </div>
-
-           
         </div>
     </div>
 </div>

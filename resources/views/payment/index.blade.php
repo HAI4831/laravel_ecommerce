@@ -65,6 +65,7 @@
         <div class="form-group">
             <label for="payment_method">Chọn phương thức thanh toán:</label>
             <select name="payment_method" id="payment_method" class="form-control" required>
+                <option value="pay_now">Thanh toán ngay</option>
                 <option value="cash_on_delivery">Thanh toán khi nhận hàng</option>
                 <option value="credit_card">Thẻ tín dụng</option>
                 <option value="bank_transfer">Chuyển khoản ngân hàng</option>

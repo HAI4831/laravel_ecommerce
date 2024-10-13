@@ -43,6 +43,10 @@ class CartController extends Controller
     // Thêm sản phẩm vào giỏ hàng
     public function store(Request $request,Product $product)
     { 
+        // $request->validate([
+        //     'product_id' => 'required|exists:products,id',
+        //     'quantity' => 'required|integer|min:1',
+        // ]);
         //Cart.index.blade.php truyền vào product_id với tham số nhận product , frameW sử dụng model binding route tìm db trả về product hợp lệ id nếu không thấy trả về null 
         if (!$product) {
             return redirect()->route('carts.index')->with('error', 'Product not found.');
@@ -139,6 +143,11 @@ class CartController extends Controller
     // Cập nhật giỏ hàng
     public function update(Request $request)
     {
+    //      // Validate input data
+    // $request->validate([
+    //     'product_id' => 'required|exists:products,id',
+    //     'quantity' => 'required|integer|min:1',
+    // ]);
         // Ghi log dữ liệu nhận được từ request và product
         Log::info('Request data_1:00:', ['request' => $request->all()]);
         Log::info('Product data:', ['product' => $product]);

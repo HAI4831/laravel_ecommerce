@@ -17,7 +17,7 @@ class ReportController extends Controller
             ->where('orders.status', 'paid')
             ->groupBy('products.category_id')
             ->get();
-        // dd($categoryRevenue);
+
         // Thống kê doanh thu theo từng phương thức thanh toán
         $paymentMethodRevenue = DB::table('orders')
             ->select('payment_method', DB::raw('SUM(amount) as total_revenue'))
@@ -47,6 +47,9 @@ class ReportController extends Controller
             ->groupBy('year')
             ->get();
 
+        // Get the selected report type
+        $reportType = request('report_type');
+
         return view('admin.reports.index', compact(
             'categoryRevenue',
             'paymentMethodRevenue',
@@ -54,7 +57,8 @@ class ReportController extends Controller
             'totalCustomers',
             'revenueByDate',
             'revenueByMonth',
-            'revenueByYear'
+            'revenueByYear',
+            'reportType'
         ));
     }
 }

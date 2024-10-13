@@ -19,7 +19,7 @@
 **Mã Giảm Giá:** {{ $orderData['coupon'] }}
 @endif
 
-@component('mail::button', ['url' => $orderData['confirm_url']])
+@component('mail::button', ['url' => $orderData['confirm_email_url']])
     Xác nhận thanh toán khi nhận hàng
 @endcomponent
 

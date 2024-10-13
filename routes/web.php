@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 // Import controllers
+use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\admin\ReportController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
@@ -18,13 +20,19 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\RatingController;
 
 
-
 // Đăng ký và đăng nhập người dùng
 Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [AuthController::class, 'register']);
 Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middleware('saveCart');
+Route::get('password/forget', function () {
+    return view('emails.forgot_password'); // Tạo view cho form quên mật khẩu
+});
+Route::post('password/forget', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+// Route để xử lý việc đặt lại mật khẩu
+Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 // Route dành cho admin (sử dụng middleware để kiểm tra quyền)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -59,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/payment', [PaymentController::class, 'index'])->name('payment.index');
     Route::post('/payment/process', [PaymentController::class, 'process'])->name('payment.process');
 
-    Route::get('/payment/confirm', [PaymentController::class, 'confirmPayment'])->name('payment.confirm');
+    Route::get('/payment/email/confirm', [PaymentController::class, 'confirmEmail'])->name('payment.email.confirm');
 
     // Route để bắt đầu thanh toán
     Route::post('/vnpay/pay', [VNPayController::class, 'pay'])->name('vnpay.pay');
@@ -73,5 +81,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/products/{product}', [ProductController::class, 'details'])->name('products.details');
     Route::post('/products/{product}/ratings', [RatingController::class, 'store'])->name('ratings.store');
     Route::get('/search/suggestions', [ProductController::class, 'searchSuggestions'])->name('search.suggestions');
-});
+    
+    // Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
+    // Route::put('/profile', [UserController::class, 'updateProfile'])->name('user.update-profile');
+   });
 

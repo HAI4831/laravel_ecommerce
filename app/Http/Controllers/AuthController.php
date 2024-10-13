@@ -64,32 +64,41 @@ class AuthController extends Controller
     }
 
     // Xử lý đăng nhập
-    public function login(Request $request)
-    {
-        // Validate dữ liệu đầu vào
-        $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
-        // Xác thực người dùng
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            // Lấy thông tin người dùng đã đăng nhập
-            $user = Auth::user();
-            // Kiểm tra vai trò của người dùng
-            if ($user->role==='admin') {
-                // Nếu là admin, chuyển hướng đến dashboard
-                return redirect()->intended(route('admin.dashboard'))->with('success', 'Welcome to Admin Dashboard.');
-            }
-            // Nếu là user, chuyển hướng đến trang welcome
-            return redirect()->intended('home')->with('success', 'You are logged in.');
-        }
+public function login(Request $request)
+{
+    // Validate dữ liệu đầu vào
+    $request->validate([
+        'email' => 'required|string|email|max:255', // Removed 'unique:users' from here
+        'password' => [
+            'required',
+            'string',
+            'min:8', 
+            'regex:/[A-Z]/', 
+        ],
+    ], [
+        'password.regex' => 'Password phải chứa ít nhất một chữ cái viết hoa.',
+        'password.min' => 'Password phải có ít nhất :min ký tự.',
+    ]);
 
-        // Đăng nhập thất bại
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
-       
+    // Xác thực người dùng
+    if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        // Lấy thông tin người dùng đã đăng nhập
+        $user = Auth::user();
+        // Kiểm tra vai trò của người dùng
+        if ($user->role === 'admin') {
+            // Nếu là admin, chuyển hướng đến dashboard
+            return redirect()->intended(route('admin.dashboard'))->with('success', 'Welcome to Admin Dashboard.');
+        }
+        // Nếu là user, chuyển hướng đến trang welcome
+        return redirect()->intended('home')->with('success', 'You are logged in.');
     }
+
+    // Đăng nhập thất bại
+    return back()->withErrors([
+        'email' => 'The provided credentials do not match our records.',
+    ]);
+}
+
 
     // Xử lý đăng xuất
     public function logout(Request $request)

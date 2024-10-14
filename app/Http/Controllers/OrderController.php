@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
@@ -54,6 +55,35 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.index')->with('success', 'Cập nhật trạng thái đơn hàng thành
         công!');
     }
+    //in hoá đơn
+    public function printInvoice($id)
+{
+    $order = Order::with('orderItems.product')->findOrFail($id);
+    
+    // Prepare invoice data
+    $invoiceData = [
+        'id' => $order->id,
+        'customer_name' => $order->customer_name,
+        'date' => $order->created_at->format('d/m/Y H:i'),
+        'products' => $order->orderItems->map(function($item) {
+            return [
+                'name' => $item->name,
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+            ];
+        }),
+        'total_amount' => $order->amount,
+    ];
+
+    // Load the invoice view
+    // dd($invoiceData);
+    $pdf = Pdf::loadView('invoices.invoice', ['invoiceData' => $invoiceData])
+          ->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+
+    // Return the generated PDF
+    return $pdf->download('invoice_'.$order->id.'.pdf');
+}
+
 
 
     // Các phương thức khác (create, store, edit, update, destroy) có thể được thêm nếu cần

@@ -1,4 +1,4 @@
-@extends('layouts.app') 
+@extends('layouts.app')
 
 @section('content')
 <div class="container mt-4">
@@ -7,28 +7,29 @@
         <h1 class="mb-4 text-center" id="banner" name="banner">Welcome to Perfume Store</h1>
     </div>
 
-    <!-- Search and Sort Form -->
+    <!-- Search Form -->
     <form action="{{ route('welcome') }}" method="GET" class="mb-4">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" id="search-input" placeholder="Tìm kiếm sản phẩm..." name="search" value="{{ $search ?? '' }}" autocomplete="off">
+            <input type="text" class="form-control" id="search-input" 
+            placeholder="Tìm kiếm sản phẩm Nguyễn Văn Hải..." 
+            name="search" value="{{ $search ?? '' }}" autocomplete="off">
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="submit">Tìm kiếm</button>
             </div>
         </div>
         <!-- Sort Options -->
         <div class="row">
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label for="sort">Sắp xếp theo:</label>
                     <select class="form-control" id="sort" name="sort" onchange="this.form.submit()">
                         <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Tên sản phẩm</option>
                         <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Giá</option>
-                        <option value="quantity" {{ request('sort') == 'quantity' ? 'selected' : '' }}>Số lượng trong kho</option>
                         <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Ngày tạo</option>
                     </select>
                 </div>
             </div>
-            <div class="col-md-6 mb-2">
+            <div class="col-md-6">
                 <div class="form-group">
                     <label for="order">Thứ tự:</label>
                     <select class="form-control" id="order" name="order" onchange="this.form.submit()">
@@ -37,7 +38,6 @@
                     </select>
                 </div>
             </div>
-        </div>
     </form>
     <div id="search-results" class="list-group" style="position: absolute; z-index: 1000; width: 100%;"></div>
 
@@ -61,7 +61,6 @@
                     <div class="card-body d-flex flex-column text-center">
                         <h5 class="card-title">{{ $product->name }}</h5>
                         <p class="card-text text-truncate"><strong>Price:</strong> {{ number_format($product->price, 0, ',', '.') }} đ</p>
-                        <p class="card-text"><strong>Số lượng:</strong> {{ $product->quantity }}</p>
                     </div>
                     
                     <!-- Hover Elements -->
@@ -91,7 +90,7 @@
     
     <!-- Pagination Display -->
     <div class="d-flex justify-content-center mt-4">
-        {{ $products->appends(['search' => $search, 'sort' => $sort, 'order' => $order])->links() }}
+        {{ $products->links() }}
     </div>
 </div>
 @endsection
@@ -138,24 +137,6 @@
     .product-card:hover .product-hover-elements {
         opacity: 1;
         visibility: visible;
-    }
-
-    /* Adjust Search Results Positioning */
-    #search-results {
-        position: absolute;
-        z-index: 1000;
-        width: 100%;
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 767.98px) {
-        .product-image-container {
-            height: 150px;
-        }
-        .product-image {
-            width: 80px;
-            height: 80px;
-        }
     }
 </style>
 @endpush

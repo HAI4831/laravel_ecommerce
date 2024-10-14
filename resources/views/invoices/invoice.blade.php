@@ -18,20 +18,20 @@
 </head>
 <body>
     <div class="invoice-box">
-        <h2>Hóa Đơn</h2>
-        <p><strong>Mã Hóa Đơn:</strong> {{ $invoiceData['id'] }}</p>
-        <p><strong>Tên Khách Hàng:</strong> {{ $invoiceData['customer_name'] }}</p>
-        <p><strong>Ngày:</strong> {{ $invoiceData['date'] }}</p>
+        <h2>Invoice</h2>
+        <p><strong>Invoice ID:</strong> {{ $invoiceData['id'] }}</p>
+        <p><strong>Customer name:</strong> {{ $invoiceData['customer_name'] }}</p>
+        <p><strong>Date:</strong> {{ $invoiceData['date'] }}</p>
         
-        <h3>Chi Tiết Sản Phẩm</h3>
+        <h3>PRODUCT DETAILS</h3>
         <table class="table">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Tên Sản Phẩm</th>
-                    <th>Số Lượng</th>
-                    <th>Giá</th>
-                    <th>Thành Tiền</th>
+                    <th>product name</th>
+                    <th>quantity</th>
+                    <th>price</th>
+                    <th>To money</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,14 +40,14 @@
                         <td>{{ $index + 1 }}</td>
                         <td>{{ $product['name'] }}</td>
                         <td style="text-align: center;">{{ $product['quantity'] }}</td>
-                        <td>{{ number_format($product['price'], 0, ',', '.') }} đ</td>
-                        <td>{{ number_format($product['price'] * $product['quantity'], 0, ',', '.') }} đ</td>
+                        <td>{{ number_format($product['price'], 0, ',', '.') }} D</td>
+                        <td>{{ number_format($product['price'] * $product['quantity'], 0, ',', '.') }} D</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
 
-        <h3>Tổng Cộng: {{ number_format($invoiceData['total_amount'], 0, ',', '.') }} đ</h3>
+        <h3>Total: {{ number_format($invoiceData['total_amount'], 0, ',', '.') }} D</h3>
     </div>
 </body>
 </html>

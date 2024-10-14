@@ -16,6 +16,7 @@
                     <th>Ngày Đặt Hàng</th>
                     <th>Hành Động</th>
                     <th>Chi Tiết Sản Phẩm</th> <!-- Thêm cột cho chi tiết sản phẩm -->
+                    <th>In Hóa Đơn</th>
                 </tr>
             </thead>
             <tbody>
@@ -65,6 +66,13 @@
                                     </li>
                                 @endforeach
                             </ul>
+                        </td>
+                        <td>
+                            <!-- Button to print invoice -->
+                            <form action="{{ route('admin.orders.printInvoice', $order->id) }}" method="GET">
+                                @csrf
+                                <button type="submit" class="btn btn-success btn-sm">In Hóa Đơn</button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach

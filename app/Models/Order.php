@@ -28,6 +28,12 @@ class Order extends Model
         'payment_date',
     ];
 
+    // Date Casting
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'payment_date' => 'datetime', // Add this line
+    ];
     // Quan hệ với User
     public function user()
     {

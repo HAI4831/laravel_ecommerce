@@ -157,6 +157,6 @@ class ProductController extends Controller
 public function show_normal(Product $product)
 {
 // Trả về view cho người dùng bình thường
-return view('products.show', compact('product'));
+return view('admin.products.show', compact('product'));
 }
 }

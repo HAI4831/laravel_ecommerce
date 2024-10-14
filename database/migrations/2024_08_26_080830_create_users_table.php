@@ -59,7 +59,8 @@ return new class extends Migration
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Nguyễn Văn Hải',
+                'name' => 'Nguyen Van Hai',
+                // 'name' => 'Nguyễn Văn Hải',
                 'email' => 'nvhai227@gmail.com',
                 'password' => Hash::make('abCD@1234'),
                 'address' => 'NB',

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 // Import controllers
+use App\Http\Controllers\Admin\StatisticsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ForgotPasswordController;
@@ -48,6 +49,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('orders', OrderController::class)->only(['index', 'show']);
     Route::patch('/orders/{order}/updatestatus', [OrderController::class, 'updateStatus'])->name('orders.updatestatus');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    // Admin Statistics Route
+    Route::get('/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 });
 
 // Route cho người dùng bình thường

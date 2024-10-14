@@ -115,8 +115,8 @@ class PaymentController extends Controller
                     'price' => $product['price'],
                     'total_price' => $product['price'] * $product['quantity'],
                 ]);
-            }
             CartItem::where('id', $product['cart_item_id'])->delete();
+            }
 
             // Commit transaction trước khi gửi email
             DB::commit(); // Commit transaction
@@ -154,8 +154,9 @@ class PaymentController extends Controller
             case 'VNPay':
                 $order->status = 'confirmed'; 
                 DB::commit(); // Commit transaction trước khi redirect
-                return redirect()->route('vnpay.checkout');
-                // return redirect()->route('vnpay.checkout', ['order_id' => $order->id]);
+                $amount = $order->amount;
+                $order_id = $order->id;
+                return view('vnpay.auto_submit', compact('amount','order_id'));
 
             case 'credit_card':
                 $order->status = 'confirmed'; 
@@ -220,12 +221,14 @@ class PaymentController extends Controller
             //     throw new \Exception('Đơn hàng đã được xử lý.');
             // }
             // Cập nhật trạng thái dựa trên phương thức thanh toán
-            if ($order->payment_method === 'cash_on_delivery') {
-                $order->status = 'confirmed'; // Nếu là "cash_on_delivery"
-            } else {
-                $order->status = 'paid'; // Nếu là các phương thức khác
-                $order->payment_date = now(); // Cập nhật ngày thanh toán
-            }
+            $order->status = 'paid'; // Nếu là các phương thức khác
+            $order->payment_date = now(); // Cập nhật ngày thanh toán
+            // if ($order->payment_method === 'cash_on_delivery') {
+            //     $order->status = 'confirmed'; // Nếu là "cash_on_delivery"
+            // } else {
+            //     $order->status = 'paid'; // Nếu là các phương thức khác
+            //     $order->payment_date = now(); // Cập nhật ngày thanh toán
+            // }
 
             $order->save();
 
@@ -264,7 +267,8 @@ class PaymentController extends Controller
             // DB::commit();
 
             // Tải hóa đơn dưới dạng PDF
-            return $pdf->download('invoice.pdf');
+            return $pdf->download('invoice.pdf')->header('Content-Type', 'application/pdf');
+
 
         // } catch (\Exception $e) {
         //     DB::rollBack(); // Rollback transaction nếu có lỗi

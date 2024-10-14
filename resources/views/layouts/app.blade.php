@@ -42,6 +42,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.orders.index') }}">Orders</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.statistics.index') }}">Statistic</a>
+                    </li>
                     <!-- @endif -->
                 @endauth
             </ul>
@@ -116,7 +119,7 @@
             </div>
         </div>
     @endauth
-    <!-- Nạp script -->
+        <!-- Nạp script -->
     @stack('scripts')   
     <!-- Include necessary JS files -->
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" 

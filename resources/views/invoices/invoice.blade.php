@@ -13,6 +13,10 @@
     <script>
         window.onload = function() {
             window.print();
+            // Chờ một chút để đảm bảo PDF đã tải
+            setTimeout(function() {
+                window.location.href = "{{ route('carts.index') }}"; // Redirect sau khi tải
+            }, 3000); // Chờ 3 giây (hoặc thời gian bạn muốn)
         };
     </script>
 </head>

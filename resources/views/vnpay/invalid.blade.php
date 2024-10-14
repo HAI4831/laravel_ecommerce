@@ -8,7 +8,6 @@
 <div class="container mt-5 text-center">
     <h2>Kết Quả Thanh Toán</h2>
     <p>Đã xảy ra sự cố trong quá trình xác thực thanh toán. Vui lòng thử lại.</p>
-    <a href="{{ route('checkout') }}" class="btn btn-warning">Thử Lại</a>
 </div>
 </body>
 </html>

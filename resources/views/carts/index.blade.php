@@ -47,20 +47,23 @@
                             <img src="{{ asset('images/' . $details['image']) }}" alt="{{ $details['name'] }}" style="width: 50px; height: auto;"> 
                         </td>
                         <td id="nameCart">{{ $details['name'] }}</td>
+                        <form></form>
                         <td>
-                        <form action="{{ route('carts.store', $id) }}" method="POST" class="updateForm" id="updateQuantity"> 
-                            @csrf
-                            <input type="number" 
-                                name="quantity" 
-                                value="{{ $details['quantity'] }}" 
-                                min="1" 
-                                class="form-control" 
-                                aria-label="Số lượng sản phẩm">
-                            <input type="hidden" 
-                                name="quantityCurrent" 
-                                value="{{ $details['quantity'] }}">
-                            <button type="button" class="btn btn-secondary mt-2" onClick="handleUpdate(event)">Cập nhật</button>
-                        </form>
+                            <form action="{{ route('carts.update', $id) }}" method="POST" class="updateForm" id="updateQuantity_{{ $id }}"> 
+                                @csrf
+                                @method('PUT')
+                                <input type="number" 
+                                       name="quantity" 
+                                       value="{{ $details['quantity'] }}" 
+                                       min="1" 
+                                       class="form-control" 
+                                       aria-label="Số lượng sản phẩm">
+                                <input type="hidden" 
+                                name="cartItemId" 
+                                value="{{ $id }}">
+                                <button type="button" class="btn btn-secondary mt-2" 
+                                onClick="handleUpdate(event, {{ $id }})">Cập nhật</button>
+                            </form>
                         </td>
                         <td>
                             {{ number_format($details['price'], 0, ',', '.') }} đ
@@ -90,20 +93,20 @@
     <a href="{{ route('welcome') }}" class="btn btn-primary">Tiếp tục mua sắm</a>
 
     <script>
-        function handleUpdate(event) {
-        // Prevent the default button action
-        event.preventDefault();
+        function handleUpdate(event, id) {
+            // Prevent the default button action
+            event.preventDefault();
 
-        // Find the form by its ID
-        var form = document.getElementById('updateQuantity');
+            // Find the form by its ID
+            var form = document.getElementById('updateQuantity_' + id);
 
-        // Check if form is found
-        if (form) {
-            // Submit the form
-            form.submit();
-        } else {
-            console.error('Form not found');
+            // Check if form is found
+            if (form) {
+                // Submit the form
+                form.submit();
+            } else {
+                console.error('Form not found for item ID:', id);
+            }
         }
-    }
     </script>
 @endsection

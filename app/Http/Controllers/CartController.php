@@ -38,6 +38,7 @@ class CartController extends Controller
         }
 
         $carts = session()->get('carts', []);
+        // dd($carts);
         return view('carts.index', compact('carts'));
     }
     // Thêm sản phẩm vào giỏ hàng
@@ -141,61 +142,52 @@ class CartController extends Controller
         return view('carts.edit', compact('carts', 'products'));
     }
     // Cập nhật giỏ hàng
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-    //      // Validate input data
-    // $request->validate([
-    //     'product_id' => 'required|exists:products,id',
-    //     'quantity' => 'required|integer|min:1',
-    // ]);
-        // Ghi log dữ liệu nhận được từ request và product
-        Log::info('Request data_1:00:', ['request' => $request->all()]);
-        Log::info('Product data:', ['product' => $product]);
-        // dd($product->name,$product->quantity);
-        if (!$product) {
-            return redirect()->route('carts.index')->with('error', 'Product not found.');
+        // Ghi log dữ liệu nhận được từ request
+        Log::info('Request data:', ['request' => $request->all()]);
+    
+        // Lấy giá trị quantity yêu cầu và cartItemId từ request
+        $requireQuantity = $request->quantity;
+        $cartItem = CartItem::find($id);
+    
+        // Kiểm tra nếu CartItem tồn tại
+        if (!$cartItem) {
+            return redirect()->route('carts.index')->with('error', 'Cart item không tồn tại');
+            // return response()->json(['success' => false, 'message' => 'Cart item không tồn tại']);
         }
-
+    
+        // Lấy quantity của sản phẩm từ mối quan hệ
+        $productQuantity = $cartItem->product->quantity;
+        
+        // Kiểm tra số lượng yêu cầu
+        if ($requireQuantity < 1 || $requireQuantity > $productQuantity) {
+            return redirect()->route('carts.index')->with('error', 'Số lượng yêu cầu không hợp lệ');
+            // return response()->json(['success' => false, 'message' => 'Số lượng yêu cầu không hợp lệ']);
+        }
+    
+        // Cập nhật số lượng trong CartItem
+        $cartItem->quantity = $requireQuantity;
+        $cartItem->save();
+    
+        // // Lấy giỏ hàng từ session
         $carts = collect(session()->get('carts', []));
-        $requestedQuantity = $request->input('quantity', 1);
+    
+        // Cập nhật số lượng trong giỏ hàng
+        $carts->put($id, array_merge($carts->get($id), ['quantity' => $requireQuantity]));
 
-         // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
-        if ($carts->has($product->id)) {
-            $item = $carts->get($product->id);
-            $currentCartQuantity = $item['quantity'];
-            $item['price'] = $product->price;
-        } else {
-            $currentCartQuantity = 0;
-        }
-
-        // Kiểm tra tổng số lượng yêu cầu có vượt quá số lượng còn lại của sản phẩm không
-        if ($currentCartQuantity + $requestedQuantity > $product->quantity) {
-            return redirect()->route('carts.index')->with('message', 'Số lượng yêu cầu vượt quá số lượng còn lại của sản phẩm.');
-        }
-
-        if ($carts->has($product->id)) {
-            $item = $carts->get($product->id);
-            $item['quantity']++;
-            $carts->put($product->id, $item);
-        } else {
-            $carts->put($product->id, [
-                "name" => $product->name,
-                "quantity" => 1,
-                "price" => $product->price,
-                "category" => $product->category->name
-            ]);
-        }
-
-        // $product->quantity -= $requestedQuantity;
-        $product->save();
+        // Lưu giỏ hàng đã cập nhật vào session
         session()->put('carts', $carts->all());
-
-        // Save cart to database when creating an order
-        $this->saveCartToDatabase();
-
-        // return redirect()->route('carts.index')->with('success', 'Sản phẩm đã được thêm vào giỏ hàng.');
-        return response()->json(['success' => true, 'message' => 'Giỏ hàng đã được cập nhật.']);
+    
+        // Lưu giỏ hàng vào cơ sở dữ liệu nếu cần
+        // $this->saveCartToDatabase();
+    
+        return redirect()->route('carts.index')->with('success', 'Sản phẩm đã được cập nhật số lượng.');
+        // Trả về phản hồi JSON cho AJAX
+        // return response()->json(['success' => true, 'message' => 'Giỏ hàng đã được cập nhật.']);
     }
+    
+
     // Xoá sản phẩm khỏi giỏ hàng
     public function destroy($id)
     {

@@ -63,7 +63,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:1',
             'category_id' => 'nullable|exists:categories,id',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         // Khởi tạo biến cho tên hình ảnh
         $imageName = null;

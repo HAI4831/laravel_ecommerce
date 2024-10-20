@@ -79,7 +79,7 @@
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="form-group">
                     <strong>Product Image:</strong>
-                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*" required>
+                    <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/*" >
                     @error('image')
                         <div class="invalid-feedback">
                             {{ $message }}

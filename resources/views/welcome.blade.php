@@ -46,6 +46,7 @@
         @forelse ($products as $index => $product)
             <div class="col-md-3 mb-4 product-col">
                 <div class="card h-100 product-card">
+                    <div id="productId_{{ $product->id }}"></div>
                     <!-- Product Image -->
                     <div class="text-center mb-3">
                         <div class="product-image-container">
@@ -76,7 +77,7 @@
                             @csrf
                             <div class="input-group input-group-sm">
                                 <input type="number" name="quantity" value="1" min="1" class="form-control" style="width: 60px;">
-                                <button type="submit" class="btn btn-success">Add</button>
+                                <button type="submit" id="add_productId_{{ $product->id }}" class="btn btn-success">Add</button>
                             </div>
                         </form>
                     </div>

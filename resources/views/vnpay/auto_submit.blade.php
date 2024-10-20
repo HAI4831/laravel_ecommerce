@@ -1,3 +1,4 @@
+<!-- vnpay/auto_submit.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -68,10 +68,10 @@
                             </ul>
                         </td>
                         <td>
-                            <!-- Button to print invoice -->
+                           <!-- Button to print invoice -->
                             <form action="{{ route('admin.orders.printInvoice', $order->id) }}" method="GET">
                                 @csrf
-                                <button type="submit" class="btn btn-success btn-sm">In Hóa Đơn</button>
+                                <button type="submit" id="buttonOrderId_{{$order->id}}" class="btn btn-success btn-sm">In Hóa Đơn</button> <!-- Fixed ID attribute -->
                             </form>
                         </td>
                     </tr>

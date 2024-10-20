@@ -22,13 +22,13 @@
     @endif
 
     @if(count($carts) > 0)
-        <form id="checkoutForm" action="{{ route('payment.index') }}" method="POST">
+        <form action="{{ route('payment.index') }}" method="POST">
             @csrf
             <table class="table">
                 <thead>
                     <tr>
                         <th>Chọn</th>
-                        <th>Hình ảnh</th>
+                        <th>Hình ảnh</th> <!-- Thêm cột Hình ảnh -->
                         <th>Tên sản phẩm</th>
                         <th>Số lượng</th>
                         <th>Giá</th>
@@ -41,26 +41,28 @@
                 @foreach($carts as $id => $details)
                     <tr>
                         <td>
-                            <input type="checkbox" id="product_{{ $id }}" name="selected_cartItems[{{ $id }}]" value="{{ json_encode($details) }}">
+                            <input type="checkbox" id="product_{{ $id }}" name="selected_cartItems[{{ $id }}]" value="{{ json_encode($details) }}" id="product_{{ $id }}">
                         </td>
                         <td>
-                            <img src="{{ asset('images/' . $details['image']) }}" alt="{{ $details['name'] }}" style="width: 50px; height: auto;"> 
+                            <img src="{{ asset('images/' . $details['image']) }}" alt="{{ $details['name'] }}" style="width: 50px; height: auto;"> Hiển thị hình ảnh
                         </td>
                         <td id="nameCart">{{ $details['name'] }}</td>
                         <td>
-                        <form action="{{ route('carts.store', $id) }}" method="POST" class="updateForm" id="updateQuantity"> 
-                            @csrf
-                            <input type="number" 
-                                name="quantity" 
-                                value="{{ $details['quantity'] }}" 
-                                min="1" 
-                                class="form-control" 
-                                aria-label="Số lượng sản phẩm">
-                            <input type="hidden" 
-                                name="quantityCurrent" 
-                                value="{{ $details['quantity'] }}">
-                            <button type="button" class="btn btn-secondary mt-2" onClick="handleUpdate(event)">Cập nhật</button>
-                        </form>
+                            <form action="{{ route('carts.store', $id) }}" method="POST" style="display:inline;" onsubmit="return handleUpdate(event)">
+                                @csrf
+                                <input type="number" 
+                                        id="quantityCart"
+                                       name="quantity" 
+                                       value="{{ $details['quantity'] }}" 
+                                       min="1" 
+                                       class="form-control">
+                                <input type="hidden" 
+                                    name="quantityCurrent" 
+                                    value="{{ $details['quantity'] }}" 
+                                    min="1" 
+                                    class="form-control">
+                                <button type="submit" class="btn btn-secondary mt-2">Cập nhật</button>
+                            </form>
                         </td>
                         <td>
                             {{ number_format($details['price'], 0, ',', '.') }} đ
@@ -88,22 +90,4 @@
     @endif
 
     <a href="{{ route('welcome') }}" class="btn btn-primary">Tiếp tục mua sắm</a>
-
-    <script>
-        function handleUpdate(event) {
-        // Prevent the default button action
-        event.preventDefault();
-
-        // Find the form by its ID
-        var form = document.getElementById('updateQuantity');
-
-        // Check if form is found
-        if (form) {
-            // Submit the form
-            form.submit();
-        } else {
-            console.error('Form not found');
-        }
-    }
-    </script>
 @endsection

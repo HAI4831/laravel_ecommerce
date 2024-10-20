@@ -26,6 +26,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // Các middleware khác
         'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        'all' => \App\Http\Middleware\AdminMiddleware::class,
         'saveCart' => \App\Http\Middleware\SaveCart::class
         ];
 

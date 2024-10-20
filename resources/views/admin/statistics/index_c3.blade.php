@@ -6,28 +6,6 @@
 <div class="container mt-4">
     <h1 class="mb-4">Statistics Dashboard</h1>
 
-    <!-- Date Range Filter -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <form id="dateRangeForm">
-                <div class="form-row">
-                    <div class="form-group col-md-5">
-                        <label for="startDate">Start Date</label>
-                        <input type="date" class="form-control" id="startDate" name="start_date" value="{{ request('start_date') }}">
-                    </div>
-                    <div class="form-group col-md-5">
-                        <label for="endDate">End Date</label>
-                        <input type="date" class="form-control" id="endDate" name="end_date" value="{{ request('end_date') }}">
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>&nbsp;</label>
-                        <button type="submit" class="btn btn-primary btn-block">Filter</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Total Sales -->
     <div class="row mb-4">
         <div class="col-md-6">
@@ -35,27 +13,6 @@
                 <div class="card-body">
                     <h5 class="card-title">Total Sales</h5>
                     <p class="card-text" style="font-size: 1.5rem;">{{ number_format($totalSales, 0, ',', '.') }} VND</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="card text-white bg-info">
-                <div class="card-body">
-                    <h5 class="card-title">Total Orders</h5>
-                    <p class="card-text" style="font-size: 1.5rem;">{{ number_format($totalOrders, 0, ',', '.') }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Total Customers -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card text-white bg-warning">
-                <div class="card-body">
-                    <h5 class="card-title">Total Customers</h5>
-                    <p class="card-text" style="font-size: 1.5rem;">{{ number_format($totalCustomers, 0, ',', '.') }}</p>
                 </div>
             </div>
         </div>
@@ -271,16 +228,6 @@
                 }
             }
         });
-    });
-
-    // Submit Date Range Form
-    document.getElementById('dateRangeForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        // Redirect to the same page with date range as query params
-        window.location.href = `{{ route('admin.reports.index') }}?start_date=${startDate}&end_date=${endDate}`;
     });
 </script>
 @endpush

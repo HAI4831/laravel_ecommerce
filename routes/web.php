@@ -31,13 +31,15 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout')->middle
 Route::get('password/forget', function () {
     return view('emails.forgot_password'); // Tạo view cho form quên mật khẩu
 });
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+
 Route::post('password/forget', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 // Route để xử lý việc đặt lại mật khẩu
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 // Route dành cho admin (sử dụng middleware để kiểm tra quyền)
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin','all'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     
     Route::resources([
@@ -56,7 +58,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // Route cho người dùng bình thường
 Route::middleware(['auth'])->group(function () {
     // Trang chủ welcome
-    Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
     Route::get('/home', [WelcomeController::class, 'index'])->name('home'); // Đã thêm route home
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product}', [ProductController::class, 'show_normal'])->name('products.show');

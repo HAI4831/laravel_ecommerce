@@ -1,59 +1,69 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\Category;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
 {
-    // Apply middleware to ensure only admins can access
-    public function __construct()
+    public function index(Request $request)
     {
-        $this->middleware(['auth', 'admin']); // Assuming 'admin' middleware is defined
-    }
+        // Date filter
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : now()->subDays(30);
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : now();
 
-    public function index()
-    {
-        // 1. Total Sales
+        // Total Sales
         $totalSales = Order::where('status', Order::STATUS_PAID)
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('amount');
 
-        // 2. Sales Over Time (Last 30 Days)
+        // Total Orders
+        $totalOrders = Order::whereBetween('created_at', [$startDate, $endDate])
+            ->count();
+
+        // Total Customers
+        $totalCustomers = Order::whereBetween('created_at', [$startDate, $endDate])
+            ->distinct('user_id')
+            ->count('user_id');
+
+        // Sales Over Time
         $salesOverTime = Order::select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(amount) as total'))
             ->where('status', Order::STATUS_PAID)
-            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('date')
             ->orderBy('date', 'ASC')
             ->get();
 
-            $salesByCategory = OrderItem::select(
-                'products.category_id', 
-                DB::raw('SUM(order_items.quantity * order_items.price) as total'),
-                'categories.name as category_name' // Select the category name
-            )
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->join('categories', 'products.category_id', '=', 'categories.id') // Join with categories
-            ->where('orders.status', Order::STATUS_PAID)
-            ->groupBy('products.category_id', 'categories.name') // Group by category name
-            ->get()
-            ->map(function($item) {
-                return [
-                    'category' => $item->category_name ?? 'Uncategorized', // Access category_name directly
-                    'total' => $item->total,
-                ];
-            });
-        
+        // Sales by Category
+        $salesByCategory = OrderItem::select(
+            'products.category_id', 
+            DB::raw('SUM(order_items.quantity * order_items.price) as total'),
+            'categories.name as category_name'
+        )
+        ->join('products', 'order_items.product_id', '=', 'products.id')
+        ->join('orders', 'order_items.order_id', '=', 'orders.id')
+        ->join('categories', 'products.category_id', '=', 'categories.id')
+        ->where('orders.status', Order::STATUS_PAID)
+        ->whereBetween('orders.created_at', [$startDate, $endDate])
+        ->groupBy('products.category_id', 'categories.name')
+        ->get()
+        ->map(function($item) {
+            return [
+                'category' => $item->category_name ?? 'Uncategorized',
+                'total' => $item->total,
+            ];
+        });
 
-        // 4. Top-Selling Products (Top 5)
+        // Top-Selling Products
         $topSellingProducts = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_quantity'))
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->where('orders.status', Order::STATUS_PAID)
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->groupBy('product_id')
             ->orderBy('total_quantity', 'DESC')
             ->with('product')
@@ -66,12 +76,13 @@ class StatisticsController extends Controller
                 ];
             });
 
-        // 5. Products Low in Stock (e.g., quantity <= 5)
+        // Products Low in Stock
         $lowStockProducts = Product::where('quantity', '<=', 5)
             ->get(['id', 'name', 'quantity']);
 
-        // 6. Order Status Distribution
+        // Order Status Distribution
         $orderStatusDistribution = Order::select('status', DB::raw('COUNT(*) as count'))
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('status')
             ->get()
             ->map(function($item) {
@@ -83,11 +94,15 @@ class StatisticsController extends Controller
 
         return view('admin.statistics.index', compact(
             'totalSales',
+            'totalOrders',
+            'totalCustomers',
             'salesOverTime',
             'salesByCategory',
             'topSellingProducts',
             'lowStockProducts',
-            'orderStatusDistribution'
+            'orderStatusDistribution',
+            'startDate',
+            'endDate'
         ));
     }
 }

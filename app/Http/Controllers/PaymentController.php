@@ -265,9 +265,10 @@ class PaymentController extends Controller
 
             // Commit transaction trước khi tải PDF
             // DB::commit();
-
+            
+            return redirect()->route('carts.index')->with('success', 'Thanh toán thành công');
             // Tải hóa đơn dưới dạng PDF
-            return $pdf->download('invoice.pdf')->header('Content-Type', 'application/pdf');
+            // return $pdf->download('invoice.pdf')->header('Content-Type', 'application/pdf');
 
 
         // } catch (\Exception $e) {

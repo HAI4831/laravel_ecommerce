@@ -69,12 +69,12 @@ public function login(Request $request)
     // Validate dữ liệu đầu vào
     $request->validate([
         'email' => 'required|string|email|max:255', // Removed 'unique:users' from here
-        'password' => [
-            'required',
-            'string',
-            'min:8', 
-            'regex:/[A-Z]/', 
-        ],
+        // 'password' => [
+        //     'required',
+        //     'string',
+        //     'min:8', 
+        //     'regex:/[A-Z]/', 
+        // ],
     ], [
         'password.regex' => 'Password phải chứa ít nhất một chữ cái viết hoa.',
         'password.min' => 'Password phải có ít nhất :min ký tự.',

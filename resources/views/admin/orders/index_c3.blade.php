@@ -15,7 +15,7 @@
                     <th>Trạng Thái</th>
                     <th>Ngày Đặt Hàng</th>
                     <th>Hành Động</th>
-                    <th>Chi Tiết Sản Phẩm</th> <!-- Thêm cột cho chi tiết sản phẩm -->
+                    <th>Chi Tiết Sản Phẩm</th>
                     <th>In Hóa Đơn</th>
                 </tr>
             </thead>
@@ -32,10 +32,7 @@
                         </td>
                         
                         <td>{{ number_format($order->amount, 0, ',', '.') }} đ</td>
-                        <td>
-                            {{ $order->payment_method}}
-                        </td>
-                        <!-- <td>{{ ucfirst($order->status) }}</td> -->
+                        <td>{{ $order->payment_method }}</td>
                         <td>
                             <!-- Form để thay đổi trạng thái đơn hàng -->
                             <form action="{{ route('admin.orders.updatestatus', $order->id) }}" method="POST">
@@ -61,19 +58,15 @@
                             <ul>
                                 @foreach($order->orderItems as $item)
                                     <li>
-                                        <img src="{{ asset('images/' . $item->product->image) }}" alt="{{ $item->product->name }}" width="50"> <!-- Hiển thị hình ảnh -->
+                                        <img src="{{ asset('images/' . $item->product->image) }}" alt="{{ $item->product->name }}" width="50"> 
                                         {{ $item->name }} ({{ $item->quantity }}) - {{ number_format($item->price, 0, ',', '.') }} đ
                                     </li>
                                 @endforeach
                             </ul>
                         </td>
                         <td>
-                             @if($order->status === 'paid') <!-- Chỉ hiển thị nút in hóa đơn khi trạng thái là "đã thanh toán" -->
-                                <!-- Button to print invoice -->
-                                <form action="{{ route('admin.orders.printInvoice', $order->id) }}" method="GET">
-                                    @csrf
-                                    <button type="submit" id="buttonOrderId_{{$order->id}}" class="btn btn-success btn-sm">In Hóa Đơn</button> <!-- Fixed ID attribute -->
-                                </form>
+                            @if($order->status === 'paid') <!-- Chỉ hiển thị nút in hóa đơn khi trạng thái là "đã thanh toán" -->
+                                <button type="button" class="btn btn-success btn-sm" onclick="printInvoice({{ $order->id }})">In Hóa Đơn</button>
                             @else
                                 <span class="text-muted">Không thể in</span>
                             @endif
@@ -89,4 +82,13 @@
     @endif
     <a href="{{ route('welcome') }}" class="btn btn-primary">Tiếp tục mua sắm</a>
 </div>
+
+<script>
+    function printInvoice(orderId) {
+        // Gọi đến route in hóa đơn
+        window.location.href = "{{ route('admin.orders.printInvoice', '') }}/" + orderId;
+        // Sau đó, gọi window.print() nếu bạn muốn in ngay lập tức
+        // window.print(); // Uncomment nếu bạn muốn hiển thị hộp thoại in ngay lập tức
+    }
+</script>
 @endsection

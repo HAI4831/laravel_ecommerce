@@ -1,3 +1,4 @@
+<!-- views.admin.products.edit.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -61,11 +62,30 @@
                     @enderror
                 </div>
             </div>
+            <!-- resources/views/admin/products/edit.blade.php -->
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                    <strong>Manufacture Date:</strong>
+                    <input type="date" name="manufacture_date" class="form-control" value="{{ $product->manufacture_date->format('Y-m-d') }}" readonly>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12">
+                <div class="form-group">
+                    <strong>Expiry Date:</strong>
+                    <input type="date" name="expiry_date" class="form-control @error('expiry_date') is-invalid @enderror" required value="{{ old('expiry_date', $product->expiry_date->format('Y-m-d')) }}">
+                    @error('expiry_date')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
+            </div>
+
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="form-group">
                     <strong>Category:</strong>
                     <select name="category_id" class="form-control @error('category_id') is-invalid @enderror" required>
-                        <option value="">Select Category</option>
+                        <!-- <option value="">Select Category</option> -->
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}" {{ $product->category_id == $category->id ? 'selected' : '' }}>
                                 {{ $category->name }}

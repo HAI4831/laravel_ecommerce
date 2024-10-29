@@ -7,7 +7,7 @@
     <h3>Chọn loại báo cáo</h3>
     <form action="{{ route('admin.reports.index') }}" method="GET">
         <select name="report_type" class="form-select" onchange="this.form.submit()">
-            <option value="">-- Chọn loại báo cáo --</option>
+            <!-- <option value="">-- Chọn loại báo cáo --</option> -->
             <option value="daily" {{ $reportType == 'daily' ? 'selected' : '' }}>Doanh thu theo ngày</option>
             <option value="monthly" {{ $reportType == 'monthly' ? 'selected' : '' }}>Doanh thu theo tháng</option>
             <option value="category" {{ $reportType == 'category' ? 'selected' : '' }}>Doanh thu theo danh mục</option>

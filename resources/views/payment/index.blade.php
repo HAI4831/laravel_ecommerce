@@ -1,4 +1,4 @@
-@extends('layouts.app') 
+@extends('layouts.app')
 
 @section('content')
     <h1>Thông tin thanh toán</h1>
@@ -16,14 +16,14 @@
                 <tr>
                     <th>Tên sản phẩm</th>
                     <th>Số lượng</th>
-                    <th>Giá</th>
-                    <th>Tổng tiền</th>
+                    <!-- <th>Giá</th> -->
+                    <!-- <th>Tổng tiền</th> -->
                 </tr>
             </thead>
             <tbody>
                 @php $totalAmount = 0; @endphp
 
-                @foreach($cartItemDetails as $cartItemDetail) <!-- Sử dụng $cartItemDetails thay cho $cartDetails -->
+                @foreach($cartItemDetails as $cartItemDetail)
                     @php 
                         $quantity = $cartItemDetail['quantity'];
                         $price = $cartItemDetail['price'];
@@ -34,31 +34,32 @@
                     <tr>
                         <td>{{ $cartItemDetail['name'] }}</td>
                         <td>
-                            <!-- Truyền chi tiết cart item dưới dạng JSON -->
                             <input type="hidden" name="cartItemDetails[{{ $cartItemDetail['id'] }}]" value="{{ json_encode($cartItemDetail) }}" id="product_{{ $cartItemDetail['id'] }}">
-                            
-                            <!-- Truyền số lượng sản phẩm -->
                             <input type="number" name="quantity[{{ $cartItemDetail['product_id'] }}]" value="{{ $quantity }}" min="1" class="form-control" readonly>
                         </td>
-                        <td>{{ number_format($price, 0, ',', '.') }} đ</td>
-                        <td>{{ number_format($totalPrice, 0, ',', '.') }} đ</td>
+                        <!-- <td>{{ number_format($price, 0, ',', '.') }} đ</td> -->
+                        <!-- <td>{{ number_format($totalPrice, 0, ',', '.') }} đ</td> -->
                     </tr>
                 @endforeach
 
-                <tr>
+                <!-- <tr>
                     <td colspan="3" class="text-right"><strong>Tổng tiền:</strong></td>
                     <td><strong>{{ number_format($totalAmount, 0, ',', '.') }} đ</strong></td>
-                </tr>
+                </tr> -->
             </tbody>
         </table>
 
-        <!-- Hidden totalAmount để truyền đến server -->
         <input type="hidden" name="totalAmount" value="{{ $totalAmount }}">
 
-        <!-- Mã giảm giá -->
+        <!-- Dropdown for discount codes -->
         <div class="form-group">
-            <label for="coupon">Mã giảm giá:</label>
-            <input type="text" name="coupon" id="coupon" class="form-control" placeholder="Nhập mã giảm giá (nếu có)">
+            <label for="discount_code">Chọn mã giảm giá:</label>
+            <select name="discount_code" id="discount_code" class="form-control">
+                <option value="">-- Chọn mã giảm giá --</option>
+                @foreach($discountCodes as $code)
+                    <option value="{{ $code->code }}">{{ $code->code }} ({{ $code->is_percentage ? $code->amount . '%' : number_format($code->amount, 0, ',', '.') . ' đ' }})</option>
+                @endforeach
+            </select>
         </div>
 
         <!-- Phương thức thanh toán -->
@@ -79,24 +80,50 @@
             <p><strong>Tổng tiền phải thanh toán: </strong> <span id="final_amount">{{ number_format($totalAmount, 0, ',', '.') }} đ</span></p>
         </div>
 
-        <!-- Nút thanh toán -->
         <button type="submit" class="btn btn-primary">Thanh toán</button>
     </form>
 
     <a href="{{ route('carts.index') }}" class="btn btn-secondary">Quay lại giỏ hàng</a>
 
     <script>
-        // JavaScript để tính lại tổng tiền khi người dùng nhập mã giảm giá
-        document.getElementById('coupon').addEventListener('input', function () {
-            let originalAmount = {{ $totalAmount }};
-            let couponCode = this.value.trim();
+    document.getElementById('discount_code').onchange = function () {
+        let originalAmount = {{ $totalAmount }};
+        let discountCode = this.value;
+        let finalAmount = originalAmount;
 
-            let finalAmount = originalAmount;
-            if (couponCode === 'DISCOUNT10') {
-                finalAmount = originalAmount * 0.9;
+        if (discountCode) {
+            // Get the selected discount code object
+            const selectedCode = @json($discountCodes).find(code => code.code === discountCode);
+
+            if (selectedCode) {
+                // Check total quantity of items
+                const quantity = Array.from(document.querySelectorAll('input[name^="quantity"]')).reduce((sum, input) => sum + parseInt(input.value), 0);
+
+                // Check conditions for applying discount codes
+                if (selectedCode.code === 'DISCOUNT11' && quantity < 200) {
+                    alert('Mã giảm giá DISCOUNT11 yêu cầu tổng số lượng phải ít nhất 200.');
+                    // Reset the discount code selection
+                    this.selectedIndex = 0; // Reset the dropdown to "Chọn mã giảm giá"
+                    finalAmount = originalAmount; // Reset to original amount
+                } else {
+                    // Apply discount based on its type
+                    if (selectedCode.is_percentage) {
+                        finalAmount *= (1 - (selectedCode.amount / 100)); // Calculate percentage discount
+                    } else {
+                        finalAmount -= selectedCode.amount; // Calculate fixed amount discount
+                    }
+                }
+            } else {
+                alert('Mã giảm giá không hợp lệ.');
+                // Reset the discount code selection
+                this.selectedIndex = 0; // Reset the dropdown to "Chọn mã giảm giá"
+                finalAmount = originalAmount; // Reset to original amount
             }
+        }
 
-            document.getElementById('final_amount').innerText = new Intl.NumberFormat().format(finalAmount) + ' đ';
-        });
-    </script>
+        // Update the displayed final amount
+        document.getElementById('final_amount').innerText = new Intl.NumberFormat().format(finalAmount) + ' đ';
+    };
+</script>
+
 @endsection

@@ -41,28 +41,6 @@
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12">
                 <div class="form-group">
-                    <strong>Manufacture Date:</strong>
-                    <input type="date" name="manufacture_date" class="form-control @error('manufacture_date') is-invalid @enderror" required value="{{ old('manufacture_date') }}">
-                    @error('manufacture_date')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
-                <div class="form-group">
-                    <strong>Expiry Date:</strong>
-                    <input type="date" name="expiry_date" class="form-control @error('expiry_date') is-invalid @enderror" required value="{{ old('expiry_date') }}">
-                    @error('expiry_date')
-                        <div class="invalid-feedback">
-                            {{ $message }}
-                        </div>
-                    @enderror
-                </div>
-            </div>
-            <div class="col-xs-12 col-sm-12 col-md-12">
-                <div class="form-group">
                     <strong>Price:</strong>
                     <input type="number" name="price" class="form-control @error('price') is-invalid @enderror" placeholder="Price" required value="{{ old('price') }}">
                     @error('price')

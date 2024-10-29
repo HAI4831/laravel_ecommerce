@@ -1,4 +1,4 @@
-@extends('layouts.app') 
+@extends('layouts.app')
 
 @section('content')
 <div class="container mt-4">
@@ -9,52 +9,65 @@
 
     <!-- Search and Sort Form -->
     <form action="{{ route('welcome') }}" method="GET" class="mb-4">
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" id="search-input" placeholder="Tìm kiếm sản phẩm..." name="search" value="{{ $search ?? '' }}" autocomplete="off">
+        <div class="input-group mb-3 justify-content-center">
+            <input type="text" class="form-control rounded-left" id="search-input" placeholder="Tìm kiếm sản phẩm..." name="search" value="{{ request('search', '') }}" autocomplete="off">
             <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="submit">Tìm kiếm</button>
+                <button class="btn btn-outline-secondary rounded-right" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
             </div>
         </div>
+
         <!-- Sort Options -->
-        <div class="row">
-            <div class="col-md-6 mb-2">
-                <div class="form-group">
-                    <label for="sort">Sắp xếp theo:</label>
-                    <select class="form-control" id="sort" name="sort" onchange="this.form.submit()">
-                        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Tên sản phẩm</option>
-                        <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Giá</option>
-                        <option value="quantity" {{ request('sort') == 'quantity' ? 'selected' : '' }}>Số lượng trong kho</option>
-                        <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Ngày tạo</option>
-                    </select>
-                </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <select class="form-control" id="sort" name="sort" onchange="this.form.submit()">
+                    <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Tên sản phẩm</option>
+                    <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Giá</option>
+                    <option value="quantity" {{ request('sort') == 'quantity' ? 'selected' : '' }}>Số lượng trong kho</option>
+                    <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Ngày tạo</option>
+                </select>
             </div>
-            <div class="col-md-6 mb-2">
-                <div class="form-group">
-                    <label for="order">Thứ tự:</label>
-                    <select class="form-control" id="order" name="order" onchange="this.form.submit()">
-                        <option value="asc" {{ request('order') == 'asc' ? 'selected' : '' }}>Tăng dần</option>
-                        <option value="desc" {{ request('order') == 'desc' ? 'selected' : '' }}>Giảm dần</option>
-                    </select>
-                </div>
+            <div class="col-md-6">
+                <select class="form-control" id="order" name="order" onchange="this.form.submit()">
+                    <option value="asc" {{ request('order') == 'asc' ? 'selected' : '' }}>Tăng dần</option>
+                    <option value="desc" {{ request('order') == 'desc' ? 'selected' : '' }}>Giảm dần</option>
+                </select>
             </div>
         </div>
     </form>
+
+   <!-- Automatic Sliding Dashboard -->
+<!-- <div id="productCarousel" class="carousel slide mb-4" data-ride="carousel">
+    <div class="carousel-inner">
+        @foreach ($products as $index => $product)
+            <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                <img src="{{ asset('images/' . $product->image) }}" class="d-block w-100 carousel-image" alt="{{ $product->name }}">
+            </div>
+        @endforeach
+    </div>
+    <a class="carousel-control-prev" href="#productCarousel" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#productCarousel" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div> -->
+
+
     <div id="search-results" class="list-group" style="position: absolute; z-index: 1000; width: 100%;"></div>
 
     <!-- Products Grid -->
     <div class="row">
         @forelse ($products as $index => $product)
-            <div class="col-md-3 mb-4 product-col">
+            <div class="col-md-3 mb-4 product-col" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
                 <div class="card h-100 product-card">
-                    <div id="productId_{{ $product->id }}"></div>
                     <!-- Product Image -->
                     <div class="text-center mb-3">
                         <div class="product-image-container">
-                            @if($product->image)
-                                <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" class="card-img-top img-fluid product-image" style="width: 100px; height: 100px; object-fit: cover;">
-                            @else
-                                <img src="{{ asset('images/default.png') }}" alt="No Image" class="card-img-top img-fluid product-image" style="width: 100px; height: 100px; object-fit: cover;">
-                            @endif
+                            <img src="{{ asset($product->image ? 'images/' . $product->image : 'images/default.png') }}" alt="{{ $product->name }}" class="card-img-top img-fluid product-image">
                         </div>
                     </div>
                     
@@ -92,7 +105,7 @@
     
     <!-- Pagination Display -->
     <div class="d-flex justify-content-center mt-4">
-        {{ $products->appends(['search' => $search, 'sort' => $sort, 'order' => $order])->links() }}
+        {{ $products->appends(request()->only(['search', 'sort', 'order']))->links() }}
     </div>
 </div>
 @endsection
@@ -100,6 +113,32 @@
 <!-- Additional CSS -->
 @push('styles')
 <style>
+    /* Search Input Styles */
+    .input-group {
+        max-width: 400px; /* Limit search form width */
+        margin: 0 auto; /* Center search form */
+    }
+
+    /* Carousel Styles */
+/* Container carousel */
+.carousel {
+    max-width: 100%; /* Đảm bảo carousel không vượt quá chiều rộng của màn hình */
+    overflow: hidden; /* Ẩn phần hình ảnh tràn ra ngoài */
+}
+
+/* Carousel Item */
+.carousel-item {
+    height: 400px; /* Chiều cao cố định cho mỗi item */
+}
+
+.carousel-item img {
+    width: 100%; /* Đảm bảo hình ảnh luôn chiếm toàn bộ chiều rộng */
+    height: 100%; /* Đảm bảo hình ảnh luôn chiếm toàn bộ chiều cao */
+    object-fit: cover; /* Giữ tỷ lệ khung hình cho hình ảnh */
+}
+
+
+
     /* Product Card Styles */
     .product-card {
         transition: transform 0.3s, box-shadow 0.3s;
@@ -111,23 +150,33 @@
     }
 
     /* Product Image Container */
-    .product-image-container {
-        height: 200px; /* Fixed height for consistency */
-        overflow: hidden;
-        background-color: #f9f9f9;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Add shadow for image */
-    }
-    
-    .product-image {
-        height: 100%;
-        width: 100%;
-        object-fit: cover; /* Ensure the image covers the container */
-        transition: transform 0.3s;
-    }
-    
-    .product-card:hover .product-image {
-        transform: scale(1.05);
-    }
+.product-image-container {
+    height: 200px; /* Fixed height for consistency */
+    overflow: hidden;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Shadow around the image */
+    border-radius: 10px; /* Optional: Add rounded corners */
+    position: relative; /* Make sure the shadow applies correctly */
+    transition: box-shadow 0.3s;
+}
+
+/* Add a subtle shadow for hover */
+.product-image-container:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+/* Product Image */
+.product-image {
+    height: 100%;
+    width: 100%;
+    object-fit: cover; /* Ensure the image covers the container */
+    transition: transform 0.3s;
+}
+
+/* Scale image slightly on hover */
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
 
     /* Hover Elements */
     .product-hover-elements {
@@ -176,43 +225,29 @@
             mirror: false
         });
 
-        var searchInput = $('#search-input');
-        var searchResults = $('#search-results');
+        var searchInput = document.getElementById('search-input');
+        var searchResults = document.getElementById('search-results');
 
-        searchInput.on('input', function() {
-            var query = $(this).val();
+        searchInput.addEventListener('input', function() {
+            var query = this.value;
 
-            if (query.length >= 2) {
-                $.ajax({
-                    url: '{{ route("search.suggestions") }}',
-                    method: 'GET',
-                    data: { query: query },
-                    success: function(data) {
-                        searchResults.empty();
-                        if (data.length > 0) {
-                            $.each(data, function(index, item) {
-                                searchResults.append('<a href="#" class="list-group-item list-group-item-action">' + item.name + '</a>');
-                            });
-                            searchResults.show();
-                        } else {
-                            searchResults.hide();
-                        }
-                    }
-                });
+            if (query.length > 0) {
+                fetch('/search?q=' + query)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        data.forEach(item => {
+                            var div = document.createElement('div');
+                            div.classList.add('list-group-item');
+                            div.innerHTML = item.name;
+                            div.onclick = () => {
+                                window.location.href = '/products/' + item.id;
+                            };
+                            searchResults.appendChild(div);
+                        });
+                    });
             } else {
-                searchResults.hide();
-            }
-        });
-
-        $(document).on('click', '#search-results a', function(e) {
-            e.preventDefault();
-            searchInput.val($(this).text());
-            searchResults.hide();
-        });
-
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('#search-input, #search-results').length) {
-                searchResults.hide();
+                searchResults.innerHTML = '';
             }
         });
     });

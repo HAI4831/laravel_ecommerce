@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.app') 
 
 @section('content')
 <div class="container">
@@ -41,6 +41,18 @@
             <div class="form-group">
                 <strong>Category:</strong>
                 {{ $product->category->name }}
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>Manufacture Date:</strong>
+                {{ $product->manufacture_date ? $product->manufacture_date->format('Y-m-d') : 'N/A' }}
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>Expiry Date:</strong>
+                {{ $product->expiry_date ? $product->expiry_date->format('Y-m-d') : 'N/A' }}
             </div>
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12">

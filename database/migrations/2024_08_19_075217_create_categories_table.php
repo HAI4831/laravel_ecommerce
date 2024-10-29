@@ -22,7 +22,8 @@ return new class extends Migration
             ['name' => 'Máy tính'],
             ['name' => 'Thức ăn'],
             ['name' => 'Nước uống'],
-            ['name' => 'iphone']
+            ['name' => 'iphone'],
+            ['name' => 'Bánh Ngọt']
         ]);
     }
 

@@ -6,104 +6,141 @@
     <title>@yield('title', 'MyShop')</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            background-color: #f8f9fa; /* Màu nền sáng */
+            background-color: #f8f9fa; /* Light background color */
         }
         .navbar {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Đổ bóng cho navbar */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for navbar */
         }
         .nav-link {
-            transition: color 0.3s;
+            transition: color 0.3s, transform 0.3s; /* Add transform transition */
         }
         .nav-link:hover {
-            color: #007bff; /* Màu khi hover */
+            color: #007bff; /* Hover color */
+            transform: scale(1.05); /* Scale up on hover */
         }
         .modal-content {
-            border-radius: 10px; /* Bo góc cho modal */
+            border-radius: 10px; /* Rounded corners for modal */
         }
         .list-group-item {
-            background-color: #e9ecef; /* Màu nền cho các mục danh sách */
+            background-color: #e9ecef; /* Background color for list items */
+        }
+        .list-group-item:hover {
+            background-color: #d3d3d3; /* Darker background on hover */
+        }
+        .icon-animation {
+            transition: transform 0.3s; /* Transition for icons */
+        }
+        .icon-animation:hover {
+            transform: rotate(360deg); /* Rotate on hover */
         }
     </style>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url('/') }}">Grocery Crumbs</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mr-auto">
-                @auth
-                    @if(Auth::user()->role !== 'admin')
-                        <li class="nav-item active">
-                            <a class="nav-link" href="{{ url('/') }}">Home <span class="sr-only">(current)</span></a>
-                        </li>
-                    @endif
-                    
-                    @if(Auth::user()->role === 'admin' || Auth::user()->role === 'all')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.products.index') }}">Products</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.categories.index') }}">Categories</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.reports.index') }}">Reports</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.orders.index') }}">Orders</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.statistics.index') }}">Statistic</a>
-                        </li>
-                    @endif
-                    
-                    @if(Auth::user()->role === 'user' || Auth::user()->role === 'all')
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('carts.index') }}">Cart</a>
-                        </li>
-                    @endif
-                @else
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{{ url('/') }}">
+        <img src="{{ asset('images/logo.png') }}" alt="Shop Electronics" style="height: 160px;" class="mr-2"> 
+        <!-- Shop Electronics -->
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+            @auth
+                @if(Auth::user()->role !== 'admin')
                     <li class="nav-item active">
-                        <a class="nav-link" href="{{ url('/') }}">Home <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="{{ url('/') }}">
+                            <i class="fas fa-home"></i> Home <span class="sr-only">(current)</span>
+                        </a>
                     </li>
-                @endauth
-            </ul>
-            <ul class="navbar-nav">
-                @guest
+                @endif
+                
+                @if(Auth::user()->role === 'admin' || Auth::user()->role === 'all')
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">Login</a>
-                    </li>
-                @else
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-toggle="modal" data-target="#profileModal">
-                            <i class="fas fa-user"></i> Profile
+                        <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                            <i class="fas fa-tachometer-alt icon-animation"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('logout') }}"
-                           onclick="event.preventDefault();
-                                     document.getElementById('logout-form').submit();">
-                            <i class="fas fa-sign-out-alt"></i> Logout
+                        <a class="nav-link" href="{{ route('admin.products.index') }}">
+                            <i class="fas fa-box icon-animation"></i> Products
                         </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
                     </li>
-                @endguest
-            </ul>
-        </div>
-    </nav>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.categories.index') }}">
+                            <i class="fas fa-tags icon-animation"></i> Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.reports.index') }}">
+                            <i class="fas fa-chart-line icon-animation"></i> Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.orders.index') }}">
+                            <i class="fas fa-shopping-cart icon-animation"></i> Orders
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.statistics.index') }}">
+                            <i class="fas fa-chart-bar icon-animation"></i> Statistics
+                        </a>
+                    </li>
+                @endif
+                
+                @if(Auth::user()->role === 'user' || Auth::user()->role === 'all')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('carts.index') }}">
+                            <i class="fas fa-shopping-basket icon-animation"></i> Cart
+                        </a>
+                    </li>
+                @endif
+            @else
+                <li class="nav-item active">
+                    <a class="nav-link" href="{{ url('/') }}">
+                        <i class="fas fa-home"></i> Home <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+            @endauth
+        </ul>
+        <ul class="navbar-nav">
+            @guest
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('register') }}">
+                        <i class="fas fa-user-plus icon-animation"></i> Register
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('login') }}">
+                        <i class="fas fa-sign-in-alt icon-animation"></i> Login
+                    </a>
+                </li>
+            @else
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-toggle="modal" data-target="#profileModal">
+                        <i class="fas fa-user icon-animation"></i> Profile
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('logout') }}"
+                       onclick="event.preventDefault();
+                                 document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt icon-animation"></i> Logout
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </li>
+            @endguest
+        </ul>
+    </div>
+</nav>
+
 
     <div class="container mt-4">
         @yield('content')

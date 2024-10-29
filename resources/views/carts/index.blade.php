@@ -75,7 +75,7 @@
                             <form action="{{ route('carts.destroy', $id) }}" method="POST" style="display:inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
                                 @csrf
                                 @method('DELETE')
-                                <button id="delCart" type="submit" class="btn btn-danger">Xóa</button>
+                                <button type="submit" class="btn btn-danger">Xóa</button>
                             </form>
                         </td>
                     </tr>

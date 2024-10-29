@@ -19,13 +19,59 @@ use Illuminate\Support\Facades\URL;
 
 class PaymentController extends Controller
 {
+    public function index(Request $request)
+{
+    $selectedCartItems = $request->input('selected_cartItems');
+
+    // Kiểm tra xem có sản phẩm nào được chọn không
+    if (empty($selectedCartItems) || !is_array($selectedCartItems)) {
+        return redirect()->route('carts.index')->with('error', 'Bạn chưa chọn sản phẩm nào.');
+    }
+
+    // Lấy cart_id của người dùng một lần
+    $cartId = Cart::where('user_id', auth()->id())->value('id');
+
+    if (!$cartId) {
+        return redirect()->route('carts.index')->with('error', 'Giỏ hàng của bạn không tồn tại.');
+    }
+
+    // Khởi tạo thông tin giỏ hàng
+    $cartItemDetails = collect($selectedCartItems)->map(function ($cartItemJson, $id) use ($cartId) {
+        $cartItem = json_decode($cartItemJson, true);
+        $quantity = $cartItem['quantity'];
+        $price = $cartItem['price'];
+        $totalPrice = $quantity * $price;
+
+        return [
+            'id' => $id,
+            'cart_id' => $cartId,
+            'product_id' => $cartItem['product_id'],
+            'name' => $cartItem['name'],
+            'quantity' => $quantity,
+            'price' => $price,
+            'total_price' => $totalPrice,
+        ];
+    });
+
+    // Lấy danh sách mã giảm giá từ database
+    $discountCodes = DB::table('discount_codes')->where('valid_until', '>=', now())->get();
+
+    // Truyền dữ liệu vào view
+    return view('payment.index', [
+        'cartItemDetails' => $cartItemDetails,
+        'discountCodes' => $discountCodes
+    ]);
+}
+
     /**
      * Xử lý quá trình đặt hàng và gửi email xác nhận thanh toán
      */
     public function process(Request $request)
     {  
+        // dd($request);
         $quantities = $request->input('quantity');
-        $coupon = $request->input('coupon');
+        $discountCode = $request->input('discount_code');
+        // $coupon = $request->input('coupon');
         $paymentMethod = $request->input('payment_method');
         $cartItemDetails = $request->input('cartItemDetails');
         $totalAmount = $request->input('totalAmount');
@@ -33,10 +79,26 @@ class PaymentController extends Controller
         if (empty($quantities) || empty($cartItemDetails)) {
             return redirect()->route('carts.index')->with('error', 'Bạn chưa chọn sản phẩm nào.');
         }
-
         // Áp dụng mã giảm giá nếu có
-        if ($coupon == 'DISCOUNT10') {
-            $totalAmount *= 0.9; // Giảm giá 10%
+        if ($discountCode) {
+            $discount = DB::table('discount_codes')->where('code', $discountCode)->first();
+            if ($discount) {
+                // Check total quantity for applying discount
+            $totalQuantity = array_sum($quantities);
+
+            // Apply specific conditions for discount codes
+            if ($discount->code === 'DISCOUNT11') {
+                if ($totalQuantity < 200) {
+                    return redirect()->route('carts.index')->with('error', 'Mã giảm giá DISCOUNT11 yêu cầu tổng số lượng phải ít nhất 200.');
+                } else {
+                    $totalAmount *= (1 - ($discount->amount / 100)); // Apply 11% discount
+                }
+            } elseif ($discount->is_percentage) {
+                $totalAmount *= (1 - ($discount->amount / 100)); // Calculate percentage discount
+            } else {
+                $totalAmount -= $discount->amount; // Calculate fixed amount discount
+            }
+            }
         }
 
         // Sử dụng transaction để đảm bảo tính toàn vẹn của dữ liệu
@@ -134,7 +196,8 @@ class PaymentController extends Controller
                 'customer_name' => $customerName,
                 'products' => $products,
                 'total_amount' => $totalAmount,
-                'coupon' => $coupon,
+                'discount_code' => $discountCode,
+                // 'coupon' => $coupon,
                 'payment_method' => $paymentMethod,
                 'date' => now()->format('d/m/Y'),
                 'confirm_email_url' => $confirmEmailUrl,
@@ -277,46 +340,7 @@ class PaymentController extends Controller
         // }
     }
 
-    /**
-     * Hiển thị danh sách giỏ hàng
-     */
-    public function index(Request $request)
-    {
-        $selectedCartItems = $request->input('selected_cartItems');
 
-        // Kiểm tra xem có sản phẩm nào được chọn không
-        if (empty($selectedCartItems) || !is_array($selectedCartItems)) {
-            return redirect()->route('carts.index')->with('error', 'Bạn chưa chọn sản phẩm nào.');
-        }
-
-        // Lấy cart_id của người dùng một lần
-        $cartId = Cart::where('user_id', auth()->id())->value('id');
-
-        if (!$cartId) {
-            return redirect()->route('carts.index')->with('error', 'Giỏ hàng của bạn không tồn tại.');
-        }
-
-        // Khởi tạo thông tin giỏ hàng
-        $cartItemDetails = collect($selectedCartItems)->map(function ($cartItemJson, $id) use ($cartId) {
-            $cartItem = json_decode($cartItemJson, true);
-            $quantity = $cartItem['quantity'];
-            $price = $cartItem['price'];
-            $totalPrice = $quantity * $price;
-
-            return [
-                'id' => $id,
-                'cart_id' => $cartId,
-                'product_id' => $cartItem['product_id'],
-                'name' => $cartItem['name'],
-                'quantity' => $quantity,
-                'price' => $price,
-                'total_price' => $totalPrice,
-            ];
-        });
-
-        // Truyền dữ liệu vào view
-        return view('payment.index', ['cartItemDetails' => $cartItemDetails]);
-    }
 
     // Các phương thức khác trong Controller không thay đổi
 }

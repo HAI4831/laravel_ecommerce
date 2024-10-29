@@ -11,13 +11,21 @@
         <div class="col-md-12">
             <form id="dateRangeForm">
                 <div class="form-row">
-                    <div class="form-group col-md-5">
-                        <label for="startDate">Start Date</label>
-                        <input type="date" class="form-control" id="startDate" name="start_date" value="{{ request('start_date') }}">
-                    </div>
+                <div class="form-group col-md-5">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" class="form-control" id="startDate" name="start_date" 
+                        value="{{ request('start_date', now()->startOfMonth()->format('Y-m-d')) }}">
+                    <small class="form-text text-muted">
+                        {{ \Carbon\Carbon::parse(request('start_date', now()->startOfMonth()))->format('d/m/Y') }}
+                    </small>
+                </div>
                     <div class="form-group col-md-5">
                         <label for="endDate">End Date</label>
-                        <input type="date" class="form-control" id="endDate" name="end_date" value="{{ request('end_date') }}">
+                        <input type="date" class="form-control" id="endDate" name="end_date" 
+                            value="{{ request('end_date', now()->endOfMonth()->format('Y-m-d')) }}">
+                        <small class="form-text text-muted">
+                            {{ \Carbon\Carbon::parse(request('end_date', now()->endOfMonth()))->format('d/m/Y') }}
+                        </small>
                     </div>
                     <div class="form-group col-md-2">
                         <label>&nbsp;</label>

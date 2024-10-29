@@ -1,4 +1,3 @@
-<!-- index.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -29,7 +28,9 @@
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Category</th>
-                <th>Image</th> <!-- New column for image -->
+                <th>Manufacture Date</th>
+                <th>Expiry Date</th>
+                <th>Image</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -40,8 +41,10 @@
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->description }}</td>
                     <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
-                    <td>{{ $product->quantity }}</td>
-                    <td>{{ $product->category->name }}</td> <!-- Display category name -->
+                    <td class="{{ $product->quantity < 5 ? 'bg-warning' : '' }}">{{ $product->quantity }}</td> <!-- Highlight low quantity -->
+                    <td>{{ $product->category->name }}</td>
+                    <td>{{ $product->manufacture_date->format('d/m/Y') }}</td>
+                    <td>{{ $product->expiry_date->format('d/m/Y') }}</td>
                     <td>
                         @if($product->image)
                         <img src="{{ asset('images/' . $product->image) }}" alt="{{ $product->name }}" style="width: 100px; height: auto;">

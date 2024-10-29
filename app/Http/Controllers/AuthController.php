@@ -33,7 +33,7 @@ class AuthController extends Controller
             // 'address' => 'nullable|string|max:255', 
             // 'phone' => 'nullable|string|max:20',    
         ], [
-            'password.regex' => 'Password phải chứa ít nhất một chữ cái viết hoa.',
+            // 'password.regex' => 'Password phải chứa ít nhất một chữ cái viết hoa.',
             // 'password.min' => 'Password phải có ít nhất :min ký tự.',
             // 'password.confirmed' => 'Password confirmation không khớp.',
             // 'email.unique' => 'Email đã được sử dụng.'

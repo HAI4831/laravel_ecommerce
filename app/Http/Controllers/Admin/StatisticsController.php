@@ -16,7 +16,15 @@ class StatisticsController extends Controller
         // Date filter
         $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : now()->subDays(30);
         $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : now();
-
+        // Fetch sales data based on the date range
+        
+        // Sales Over Time
+        $salesOverTime = Order::select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(amount) as total'))
+            ->where('status', Order::STATUS_PAID)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get();
         // Total Sales
         $totalSales = Order::where('status', Order::STATUS_PAID)
             ->whereBetween('created_at', [$startDate, $endDate])
@@ -91,6 +99,7 @@ class StatisticsController extends Controller
                     'count' => $item->count,
                 ];
             });
+
 
         return view('admin.statistics.index', compact(
             'totalSales',

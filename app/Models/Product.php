@@ -9,27 +9,50 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'price','quantity' ,'image','category_id'];
-
+    // Specify the fields that can be mass assigned
+    protected $fillable = [
+        'name', 
+        'description', 
+        'price',
+        'quantity',
+        'image',
+        'category_id',
+        'manufacture_date',
+        'expiry_date'
+    ];
+    // Cast the dates to Carbon instances
+    protected $casts = [
+        'manufacture_date' => 'date',
+        'expiry_date' => 'date',
+    ];
+    
+        
+    // Relationship to the Category model
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
-        public function comments()
+
+    // Relationship to the Comment model
+    public function comments()
     {
         return $this->hasMany(Comment::class);
     }
+
     // Accessor for formatted price
     public function getFormattedPriceAttribute()
     {
         return number_format($this->price, 0, ',', '.') . ' VNĐ';
     }
-        public function ratings()
+
+    // Relationship to the Rating model
+    public function ratings()
     {
         return $this->hasMany(Rating::class);
     }
+
     /**
-     * Tính trung bình đánh giá của sản phẩm.
+     * Calculate the average rating of the product.
      *
      * @return float
      */
@@ -37,5 +60,24 @@ class Product extends Model
     {
         return $this->ratings()->avg('rating') ?? 0;
     }
-}
 
+    /**
+     * Check if the product is expired.
+     *
+     * @return bool
+     */
+    public function isExpired()
+    {
+        return $this->expiry_date && $this->expiry_date < now()->format('Y-m-d');
+    }
+    
+    /**
+     * Check if stock is low (less than 5 items).
+     *
+     * @return bool
+     */
+    public function isLowStock()
+    {
+        return $this->quantity < 5;
+    }
+}
